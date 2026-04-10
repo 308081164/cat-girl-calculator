@@ -34,7 +34,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 decoration: BoxDecoration(
                   border: Border(
-                    bottom: BorderSide(color: AppColors.cyan.withValues(alpha: 0.3), width: 2),
+                    bottom: BorderSide(color: AppColors.border, width: 1),
                   ),
                 ),
                 child: Row(
@@ -45,10 +45,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                       style: TextStyle(
                         fontFamily: 'PressStart2P',
                         fontSize: 12,
-                        color: AppColors.cyan,
-                        shadows: const [
-                          Shadow(color: AppColors.cyan, blurRadius: 8),
-                        ],
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   ],
@@ -60,7 +57,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 child: DisplayArea(controller: _controller),
               ),
               // Separator
-              Container(height: 2, color: AppColors.cyan.withValues(alpha: 0.5)),
+              Container(height: 1, color: AppColors.border),
               // Button grid
               Expanded(
                 flex: 7,

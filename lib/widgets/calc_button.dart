@@ -16,23 +16,31 @@ class _CalcButtonState extends State<CalcButton> {
   bool _isPressed = false;
 
   Color _getBackgroundColor() {
-    if (widget.label == '=') return AppColors.magenta.withValues(alpha: 0.3);
+    if (widget.label == '=') return AppColors.buttonSpecialBg;
     if ('÷×+-'.contains(widget.label)) return AppColors.buttonOpBg;
-    if (widget.label == 'C') return AppColors.red.withValues(alpha: 0.2);
-    if (widget.label == '⌫') return AppColors.buttonSpecialBg;
-    return AppColors.buttonBg;
+    if (widget.label == 'C') return AppColors.buttonBg;
+    if (widget.label == '⌫') return AppColors.buttonOpBg;
+    return AppColors.panel;
+  }
+
+  Color _getPressedBackgroundColor() {
+    if (widget.label == '=') return const Color(0xFF006CBE);
+    if ('÷×+-'.contains(widget.label)) return const Color(0xFFD8D8D8);
+    if (widget.label == 'C') return const Color(0xFFE0E0E0);
+    if (widget.label == '⌫') return const Color(0xFFD8D8D8);
+    return const Color(0xFFE8E8E8);
   }
 
   Color _getBorderColor() {
-    if (widget.label == '=') return AppColors.magenta;
-    if ('÷×+-'.contains(widget.label)) return AppColors.cyan.withValues(alpha: 0.6);
-    if (widget.label == 'C') return AppColors.red.withValues(alpha: 0.6);
-    return AppColors.cyan.withValues(alpha: 0.2);
+    return AppColors.border;
   }
 
   TextStyle _getTextStyle() {
     if (widget.label == '=') return PixelTextStyles.buttonSpecial;
     if ('÷×+-'.contains(widget.label)) return PixelTextStyles.buttonOp;
+    if (widget.label == 'C') {
+      return PixelTextStyles.button.copyWith(color: AppColors.red);
+    }
     return PixelTextStyles.button;
   }
 
@@ -49,22 +57,20 @@ class _CalcButtonState extends State<CalcButton> {
         duration: const Duration(milliseconds: 80),
         decoration: BoxDecoration(
           color: _isPressed
-              ? _getBackgroundColor().withValues(alpha: 0.5)
+              ? _getPressedBackgroundColor()
               : _getBackgroundColor(),
-          border: Border.all(color: _getBorderColor(), width: 2),
-          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: _getBorderColor(), width: 1),
+          borderRadius: BorderRadius.circular(8),
           boxShadow: _isPressed
               ? []
               : [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    offset: const Offset(2, 2),
+                    color: Colors.black.withValues(alpha: 0.06),
+                    offset: const Offset(0, 1),
+                    blurRadius: 2,
                   ),
                 ],
         ),
-        transform: _isPressed
-            ? (Matrix4.identity()..translate(0.0, 1.0))
-            : Matrix4.identity(), // ignore: deprecated_member_use
         child: Center(
           child: Text(
             widget.label,

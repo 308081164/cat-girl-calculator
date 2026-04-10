@@ -16,16 +16,16 @@ class ScanlineOverlay extends StatelessWidget {
 class ScanlinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // Scanlines
+    // Scanlines - greatly reduced opacity
     final scanlinePaint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.06)
+      ..color = Colors.black.withValues(alpha: 0.015)
       ..style = PaintingStyle.fill;
 
     for (double y = 0; y < size.height; y += 3) {
       canvas.drawRect(Rect.fromLTWH(0, y, size.width, 1), scanlinePaint);
     }
 
-    // Vignette effect
+    // Vignette effect - greatly reduced
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
     final vignettePaint = Paint()
       ..shader = ui.Gradient.radial(
@@ -33,7 +33,7 @@ class ScanlinePainter extends CustomPainter {
         size.width * 0.8,
         [
           const ui.Color(0x00000000),
-          const ui.Color(0x40000000),
+          const ui.Color(0x0D000000),
         ],
       );
 

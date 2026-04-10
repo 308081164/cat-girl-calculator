@@ -12,12 +12,12 @@ class CatGirlCalculatorApp extends StatelessWidget {
       title: '猫猫计算器',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: Brightness.dark,
+        brightness: Brightness.light,
         scaffoldBackgroundColor: AppColors.background,
         textTheme: GoogleFonts.pressStart2pTextTheme(),
-        colorScheme: const ColorScheme.dark(
+        colorScheme: const ColorScheme.light(
           primary: AppColors.cyan,
-          secondary: AppColors.magenta,
+          secondary: AppColors.yellow,
           surface: AppColors.panel,
         ),
       ),
