@@ -60,16 +60,12 @@ jobs:
           echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
           echo "New version: $NEW_VERSION+$BUILD_NUMBER"
 
-          # Update pubspec.yaml
+          # Update version in pubspec.yaml only (Flutter reads version from there)
           sed -i "s/^version:.*/version: $NEW_VERSION+$BUILD_NUMBER/" pubspec.yaml
-
-          # Update version in Android build
-          sed -i "s/versionName \".*\"/versionName \"$NEW_VERSION\"/" android/app/build.gradle.kts
-          sed -i "s/versionCode .*/versionCode $BUILD_NUMBER/" android/app/build.gradle.kts
 
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          git add pubspec.yaml android/app/build.gradle.kts
+          git add pubspec.yaml
           git commit -m "chore: bump version to $NEW_VERSION+$BUILD_NUMBER" || echo "No changes to commit"
           git push || echo "No push needed"
 
