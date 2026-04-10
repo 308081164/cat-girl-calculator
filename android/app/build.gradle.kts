@@ -30,9 +30,7 @@ android {
     // Use debug keystore for release builds to ensure consistent signing
     signingConfigs {
         create("release") {
-            // Use the debug keystore so that the signing is consistent across builds.
-            // This avoids "INSTALL_FAILED_UPDATE_INCOMPATIBLE" errors when reinstalling.
-            storeFile = file("${System.getProperty('user.home')}/.android/debug.keystore")
+            storeFile = file(System.getProperty("user.home") + "/.android/debug.keystore")
             storePassword = "android"
             keyAlias = "androiddebugkey"
             keyPassword = "android"
