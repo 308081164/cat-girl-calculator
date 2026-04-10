@@ -1,4 +1,4 @@
-name: Build APK
+name: Build & Release APK
 
 on:
   push:
@@ -8,10 +8,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -29,12 +33,71 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Bump version
+        id: version
+        run: |
+          # Read current version from pubspec.yaml
+          CURRENT_VERSION=$(grep 'version:' pubspec.yaml | head -1 | awk '{print $2}' | cut -d'+' -f1)
+          echo "Current version: $CURRENT_VERSION"
+
+          # Parse major.minor.patch
+          MAJOR=$(echo $CURRENT_VERSION | cut -d'.' -f1)
+          MINOR=$(echo $CURRENT_VERSION | cut -d'.' -f2)
+          PATCH=$(echo $CURRENT_VERSION | cut -d'.' -f3)
+
+          # Check if this is a new commit (not just a version bump)
+          LAST_COMMIT_MSG=$(git log -1 --pretty=%s)
+          if [[ "$LAST_COMMIT_MSG" == *"bump version"* ]]; then
+            NEW_VERSION="$CURRENT_VERSION"
+            echo "Already bumped, skipping"
+          else
+            PATCH=$((PATCH + 1))
+            NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          fi
+
+          BUILD_NUMBER=$(git rev-list --count main)
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION+$BUILD_NUMBER"
+
+          # Update pubspec.yaml
+          sed -i "s/^version:.*/version: $NEW_VERSION+$BUILD_NUMBER/" pubspec.yaml
+
+          # Update version in Android build
+          sed -i "s/versionName \".*\"/versionName \"$NEW_VERSION\"/" android/app/build.gradle.kts
+          sed -i "s/versionCode .*/versionCode $BUILD_NUMBER/" android/app/build.gradle.kts
+
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add pubspec.yaml android/app/build.gradle.kts
+          git commit -m "chore: bump version to $NEW_VERSION+$BUILD_NUMBER" || echo "No changes to commit"
+          git push || echo "No push needed"
+
       - name: Build APK (release)
         run: flutter build apk --release
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - name: Rename APK
+        run: |
+          mv build/app/outputs/flutter-apk/app-release.apk \
+            build/app/outputs/flutter-apk/CatGirlCalculator-${{ steps.version.outputs.version }}.apk
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: cat-girl-calculator-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-          retention-days: 7
+          tag_name: v${{ steps.version.outputs.version }}
+          name: "v${{ steps.version.outputs.version }}"
+          body: |
+            ## 🐱 猫猫计算器 v${{ steps.version.outputs.version }}
+
+            ### 更新内容
+            - 佩佩风格猫娘角色（金色头发、埃及装饰）
+            - Fluent Design 配色方案
+            - 现代圆角按钮设计
+
+            ### 安装说明
+            下载 `CatGirlCalculator-${{ steps.version.outputs.version }}.apk` 并安装到 Android 设备。
+          files: build/app/outputs/flutter-apk/CatGirlCalculator-${{ steps.version.outputs.version }}.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
