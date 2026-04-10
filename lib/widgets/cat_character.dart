@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../models/cat_state.dart';
 
@@ -96,7 +97,7 @@ class CatGirlPainter extends CustomPainter {
   // Hair - golden/light brown, 5 layers
   static const hairLight = Color(0xFFF5D585);   // golden highlight
   static const hairBase = Color(0xFFD4A040);    // golden base
-  static const hairMid = Color(0xFFC89838);     // mid tone (new)
+  static const hairMid = Color(0xFFC89838);     // mid tone
   static const hairDark = Color(0xFFB08030);    // dark golden shadow
   static const hairShadow = Color(0xFF8B6914);  // deepest shadow
 
@@ -124,7 +125,7 @@ class CatGirlPainter extends CustomPainter {
   static const clothBase = Color(0xFF555565);   // dark gray-blue base
   static const clothLight = Color(0xFF707080);  // light highlight
   static const clothDark = Color(0xFF404050);   // dark shadow
-  static const clothAccent = Color(0xFF8888A0); // accent (new)
+  static const clothAccent = Color(0xFF8888A0); // accent
 
   // Ribbon decoration
   static const ribbon = Color(0xFF333340);      // dark ribbon
@@ -136,6 +137,96 @@ class CatGirlPainter extends CustomPainter {
   // Cat ears
   static const earInner = Color(0xFFFFD5D5);    // ear inner pink
   static const earFur = Color(0xFFF0C8C8);      // ear inner fur
+
+  // ============================================================
+  // Anti-aliased drawing helper methods
+  // ============================================================
+
+  /// Smooth pixel - uses rounded rectangle with slight inset and anti-aliasing
+  void _drawPixel(Canvas canvas, double x, double y, Color color) {
+    final paint = Paint()
+      ..color = color
+      ..isAntiAlias = true
+      ..style = PaintingStyle.fill;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(x + 0.02, y + 0.02, 0.96, 0.96),
+        const Radius.circular(0.15),
+      ),
+      paint,
+    );
+  }
+
+  /// Smooth rectangle block - with rounded corners and anti-aliasing
+  void _drawPixelRect(Canvas canvas, double x, double y, double w, double h, Color color) {
+    final paint = Paint()
+      ..color = color
+      ..isAntiAlias = true
+      ..style = PaintingStyle.fill;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(x + 0.02, y + 0.02, w - 0.04, h - 0.04),
+        const Radius.circular(0.15),
+      ),
+      paint,
+    );
+  }
+
+  /// Smooth ellipse - for eyes, blush, etc.
+  void _drawEllipse(Canvas canvas, double cx, double cy, double rx, double ry, Color color) {
+    final paint = Paint()
+      ..color = color
+      ..isAntiAlias = true
+      ..style = PaintingStyle.fill;
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(cx, cy), width: rx * 2, height: ry * 2),
+      paint,
+    );
+  }
+
+  /// Smooth line - for hair highlights, outlines, etc.
+  void _drawLine(Canvas canvas, double x1, double y1, double x2, double y2, Color color, {double width = 0.8}) {
+    final paint = Paint()
+      ..color = color
+      ..isAntiAlias = true
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = width
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset(x1, y1), Offset(x2, y2), paint);
+  }
+
+  /// Smooth arc - for eyebrows, mouth, etc.
+  void _drawArc(Canvas canvas, double cx, double cy, double rx, double ry, double startAngle, double sweepAngle, Color color, {double width = 0.8}) {
+    final paint = Paint()
+      ..color = color
+      ..isAntiAlias = true
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = width
+      ..strokeCap = StrokeCap.round;
+    canvas.drawArc(
+      Rect.fromCenter(center: Offset(cx, cy), width: rx * 2, height: ry * 2),
+      startAngle, sweepAngle, false, paint,
+    );
+  }
+
+  /// Smooth dot - for highlights, small decorations
+  void _drawDot(Canvas canvas, double cx, double cy, double r, Color color) {
+    final paint = Paint()
+      ..color = color
+      ..isAntiAlias = true;
+    canvas.drawCircle(Offset(cx, cy), r, paint);
+  }
+
+  /// Transition pixel - semi-transparent blend at color boundaries
+  void _drawBlendPixel(Canvas canvas, double x, double y, Color color, {double alpha = 0.4}) {
+    final paint = Paint()
+      ..color = color.withValues(alpha: alpha)
+      ..isAntiAlias = true;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromLTWH(x, y, 1, 1), const Radius.circular(0.2)),
+      paint,
+    );
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -167,16 +258,6 @@ class CatGirlPainter extends CustomPainter {
         _drawCelebrating(canvas);
         break;
     }
-  }
-
-  void _drawPixel(Canvas canvas, double x, double y, Color color) {
-    final paint = Paint()..color = color;
-    canvas.drawRect(Rect.fromLTWH(x, y, 1, 1), paint);
-  }
-
-  void _drawPixelRect(Canvas canvas, double x, double y, double w, double h, Color color) {
-    final paint = Paint()..color = color;
-    canvas.drawRect(Rect.fromLTWH(x, y, w, h), paint);
   }
 
   // ============================================================
@@ -211,13 +292,17 @@ class CatGirlPainter extends CustomPainter {
     // Row 9 (base)
     _drawPixelRect(canvas, 37 + offX, 13 + offY, 2, 1, hairDark);
 
-    // Left ear inner (pink, 4-5px wide, 5 rows)
-    _drawPixelRect(canvas, 36 + offX, 6 + offY, 4, 1, earInner);
-    _drawPixelRect(canvas, 35 + offX, 7 + offY, 6, 1, earInner);
-    _drawPixelRect(canvas, 35 + offX, 8 + offY, 5, 1, earInner);
-    _drawPixelRect(canvas, 35 + offX, 8 + offY, 2, 1, earFur);
-    _drawPixelRect(canvas, 36 + offX, 9 + offY, 4, 1, earFur);
-    _drawPixelRect(canvas, 37 + offX, 10 + offY, 2, 1, earFur);
+    // Left ear inner (pink) - use ellipse for smooth inner area
+    _drawEllipse(canvas, 38 + offX, 8 + offY, 2.5, 2.5, earInner);
+    _drawEllipse(canvas, 38 + offX, 9.5 + offY, 2, 1.5, earFur);
+
+    // Left ear outline - smooth lines for edges
+    _drawLine(canvas, 39 + offX, 4.5 + offY, 33 + offX, 13.5 + offY, hairShadow, width: 0.6);
+    _drawLine(canvas, 39 + offX, 4.5 + offY, 43 + offX, 13.5 + offY, hairShadow, width: 0.6);
+
+    // Blend pixels at ear base transition
+    _drawBlendPixel(canvas, 36 + offX, 13 + offY, hairShadow, alpha: 0.25);
+    _drawBlendPixel(canvas, 40 + offX, 13 + offY, hairShadow, alpha: 0.25);
 
     // Right ear
     if (rightDroopy) {
@@ -229,8 +314,11 @@ class CatGirlPainter extends CustomPainter {
       _drawPixelRect(canvas, 82 + offX, 10 + offY, 4, 1, hairBase);
       _drawPixelRect(canvas, 83 + offX, 9 + offY, 2, 1, hairBase);
       // Droopy ear inner
-      _drawPixelRect(canvas, 80 + offX, 11 + offY, 4, 1, earInner);
-      _drawPixelRect(canvas, 82 + offX, 10 + offY, 2, 1, earFur);
+      _drawEllipse(canvas, 82 + offX, 11 + offY, 1.5, 1, earInner);
+      _drawEllipse(canvas, 83 + offX, 10 + offY, 1, 0.8, earFur);
+      // Droopy ear outline
+      _drawLine(canvas, 78 + offX, 12.5 + offY, 83.5 + offX, 9.5 + offY, hairShadow, width: 0.6);
+      _drawLine(canvas, 86 + offX, 12.5 + offY, 83.5 + offX, 9.5 + offY, hairShadow, width: 0.6);
     } else {
       // Normal right ear - tall triangle, 10 rows high, 8 cols wide
       // Row 0 (tip)
@@ -260,13 +348,17 @@ class CatGirlPainter extends CustomPainter {
       // Row 9 (base)
       _drawPixelRect(canvas, 89 + offX, 13 + offY, 2, 1, hairDark);
 
-      // Right ear inner (pink, 4-5px wide, 5 rows)
-      _drawPixelRect(canvas, 88 + offX, 6 + offY, 4, 1, earInner);
-      _drawPixelRect(canvas, 87 + offX, 7 + offY, 6, 1, earInner);
-      _drawPixelRect(canvas, 88 + offX, 8 + offY, 5, 1, earInner);
-      _drawPixelRect(canvas, 91 + offX, 8 + offY, 2, 1, earFur);
-      _drawPixelRect(canvas, 88 + offX, 9 + offY, 4, 1, earFur);
-      _drawPixelRect(canvas, 89 + offX, 10 + offY, 2, 1, earFur);
+      // Right ear inner (pink) - smooth ellipse
+      _drawEllipse(canvas, 90 + offX, 8 + offY, 2.5, 2.5, earInner);
+      _drawEllipse(canvas, 90 + offX, 9.5 + offY, 2, 1.5, earFur);
+
+      // Right ear outline - smooth lines
+      _drawLine(canvas, 89 + offX, 4.5 + offY, 85 + offX, 13.5 + offY, hairShadow, width: 0.6);
+      _drawLine(canvas, 89 + offX, 4.5 + offY, 95 + offX, 13.5 + offY, hairShadow, width: 0.6);
+
+      // Blend pixels at ear base transition
+      _drawBlendPixel(canvas, 88 + offX, 13 + offY, hairShadow, alpha: 0.25);
+      _drawBlendPixel(canvas, 92 + offX, 13 + offY, hairShadow, alpha: 0.25);
     }
   }
 
@@ -340,13 +432,13 @@ class CatGirlPainter extends CustomPainter {
     _drawPixelRect(canvas, 91 + offX, 13 + offY, 3, 3, hairBase);
     _drawPixelRect(canvas, 91 + offX, 13 + offY, 1, 1, hairLight);
 
-    // Highlight lines on bangs
-    _drawPixelRect(canvas, 36 + offX, 14 + offY, 1, 2, hairLight);
-    _drawPixelRect(canvas, 46 + offX, 14 + offY, 1, 2, hairLight);
-    _drawPixelRect(canvas, 63 + offX, 14 + offY, 1, 2, hairLight);
-    _drawPixelRect(canvas, 77 + offX, 14 + offY, 1, 2, hairLight);
+    // Highlight lines on bangs - use smooth lines instead of rectangles
+    _drawLine(canvas, 36.5 + offX, 14 + offY, 36.5 + offX, 16 + offY, hairLight, width: 0.7);
+    _drawLine(canvas, 46.5 + offX, 14 + offY, 46.5 + offX, 16 + offY, hairLight, width: 0.7);
+    _drawLine(canvas, 63.5 + offX, 14 + offY, 63.5 + offX, 16 + offY, hairLight, width: 0.7);
+    _drawLine(canvas, 77.5 + offX, 14 + offY, 77.5 + offX, 16 + offY, hairLight, width: 0.7);
 
-    // Side hair - left (long flowing to y≈75)
+    // Side hair - left (long flowing to y~75)
     _drawPixelRect(canvas, 30 + offX, 14 + offY, 4, 28, hairBase);
     _drawPixelRect(canvas, 30 + offX, 14 + offY, 2, 8, hairLight);
     _drawPixelRect(canvas, 28 + offX, 22 + offY, 2, 20, hairBase);
@@ -354,11 +446,11 @@ class CatGirlPainter extends CustomPainter {
     _drawPixelRect(canvas, 30 + offX, 34 + offY, 2, 8, hairDark);
     _drawPixelRect(canvas, 28 + offX, 38 + offY, 2, 6, hairShadow);
     _drawPixelRect(canvas, 30 + offX, 42 + offY, 2, 4, hairShadow);
-    // Hair strand highlight
-    _drawPixelRect(canvas, 31 + offX, 18 + offY, 1, 6, hairLight);
-    _drawPixelRect(canvas, 29 + offX, 28 + offY, 1, 4, hairMid);
+    // Hair strand highlight - smooth line
+    _drawLine(canvas, 31.5 + offX, 18 + offY, 31.5 + offX, 24 + offY, hairLight, width: 0.8);
+    _drawLine(canvas, 29.5 + offX, 28 + offY, 29.5 + offX, 32 + offY, hairMid, width: 0.6);
 
-    // Side hair - right (long flowing to y≈75)
+    // Side hair - right (long flowing to y~75)
     _drawPixelRect(canvas, 94 + offX, 14 + offY, 4, 28, hairBase);
     _drawPixelRect(canvas, 96 + offX, 14 + offY, 2, 8, hairLight);
     _drawPixelRect(canvas, 98 + offX, 22 + offY, 2, 20, hairBase);
@@ -366,9 +458,15 @@ class CatGirlPainter extends CustomPainter {
     _drawPixelRect(canvas, 96 + offX, 34 + offY, 2, 8, hairDark);
     _drawPixelRect(canvas, 98 + offX, 38 + offY, 2, 6, hairShadow);
     _drawPixelRect(canvas, 96 + offX, 42 + offY, 2, 4, hairShadow);
-    // Hair strand highlight
-    _drawPixelRect(canvas, 96 + offX, 18 + offY, 1, 6, hairLight);
-    _drawPixelRect(canvas, 98 + offX, 28 + offY, 1, 4, hairMid);
+    // Hair strand highlight - smooth line
+    _drawLine(canvas, 96.5 + offX, 18 + offY, 96.5 + offX, 24 + offY, hairLight, width: 0.8);
+    _drawLine(canvas, 98.5 + offX, 28 + offY, 98.5 + offX, 32 + offY, hairMid, width: 0.6);
+
+    // Blend pixels at hair-to-face transition edges
+    _drawBlendPixel(canvas, 32 + offX, 17 + offY, hairShadow, alpha: 0.2);
+    _drawBlendPixel(canvas, 94 + offX, 17 + offY, hairShadow, alpha: 0.2);
+    _drawBlendPixel(canvas, 30 + offX, 42 + offY, hairShadow, alpha: 0.3);
+    _drawBlendPixel(canvas, 98 + offX, 42 + offY, hairShadow, alpha: 0.3);
   }
 
   // ============================================================
@@ -401,156 +499,163 @@ class CatGirlPainter extends CustomPainter {
     _drawPixelRect(canvas, 42 + offX, 40 + offY, 44, 4, skinShadow);
     _drawPixelRect(canvas, 46 + offX, 42 + offY, 36, 2, skinDark);
 
+    // Blend pixels at face contour edges
+    _drawBlendPixel(canvas, 37 + offX, 20 + offY, skinShadow, alpha: 0.2);
+    _drawBlendPixel(canvas, 37 + offX, 28 + offY, skinShadow, alpha: 0.15);
+    _drawBlendPixel(canvas, 90 + offX, 20 + offY, skinShadow, alpha: 0.2);
+    _drawBlendPixel(canvas, 90 + offX, 28 + offY, skinShadow, alpha: 0.15);
+    _drawBlendPixel(canvas, 50 + offX, 43 + offY, skinDark, alpha: 0.2);
+    _drawBlendPixel(canvas, 70 + offX, 43 + offY, skinDark, alpha: 0.2);
+
     // Eyes
     if (xxEyes) {
-      // X_X dizzy eyes (scaled up)
+      // X_X dizzy eyes - use smooth lines for X shape
       // Left X
-      _drawPixelRect(canvas, 46 + offX, 28 + offY, 2, 2, eyeIris);
-      _drawPixelRect(canvas, 50 + offX, 28 + offY, 2, 2, eyeIris);
-      _drawPixelRect(canvas, 48 + offX, 30 + offY, 2, 2, eyeIris);
-      _drawPixelRect(canvas, 44 + offX, 30 + offY, 2, 2, eyeIris);
+      _drawLine(canvas, 46 + offX, 29 + offY, 51 + offX, 32 + offY, eyeIris, width: 1.2);
+      _drawLine(canvas, 51 + offX, 29 + offY, 46 + offX, 32 + offY, eyeIris, width: 1.2);
       // Right X
-      _drawPixelRect(canvas, 74 + offX, 28 + offY, 2, 2, eyeIris);
-      _drawPixelRect(canvas, 78 + offX, 28 + offY, 2, 2, eyeIris);
-      _drawPixelRect(canvas, 76 + offX, 30 + offY, 2, 2, eyeIris);
-      _drawPixelRect(canvas, 72 + offX, 30 + offY, 2, 2, eyeIris);
+      _drawLine(canvas, 73 + offX, 29 + offY, 78 + offX, 32 + offY, eyeIris, width: 1.2);
+      _drawLine(canvas, 78 + offX, 29 + offY, 73 + offX, 32 + offY, eyeIris, width: 1.2);
     } else if (blink) {
-      // Blinking - 2 pixel high curved line
-      _drawPixelRect(canvas, 44 + offX, 32 + offY, 10, 2, eyeIris);
-      _drawPixelRect(canvas, 74 + offX, 32 + offY, 10, 2, eyeIris);
-      // Eyelashes on blink
-      _drawPixelRect(canvas, 43 + offX, 31 + offY, 2, 1, eyeIrisDark);
-      _drawPixelRect(canvas, 83 + offX, 31 + offY, 2, 1, eyeIrisDark);
+      // Blinking - smooth arc for closed eye
+      _drawArc(canvas, 49 + offX, 33 + offY, 5, 1.5, math.pi, -math.pi, eyeIris, width: 1.2);
+      _drawArc(canvas, 79 + offX, 33 + offY, 5, 1.5, math.pi, -math.pi, eyeIris, width: 1.2);
+      // Eyelashes on blink - smooth dots
+      _drawDot(canvas, 43 + offX, 31.5 + offY, 0.8, eyeIrisDark);
+      _drawDot(canvas, 84 + offX, 31.5 + offY, 0.8, eyeIrisDark);
     } else if (starEyes) {
-      // Star-shaped happy eyes (cross pattern, scaled up)
+      // Star-shaped happy eyes - use smooth shapes
       // Left star eye
-      _drawPixelRect(canvas, 46 + offX, 30 + offY, 6, 2, goldLight);
-      _drawPixelRect(canvas, 48 + offX, 28 + offY, 2, 6, goldLight);
-      _drawPixelRect(canvas, 48 + offX, 30 + offY, 2, 2, goldAccent);
-      _drawPixelRect(canvas, 46 + offX, 28 + offY, 2, 2, goldAccent);
-      _drawPixelRect(canvas, 50 + offX, 28 + offY, 2, 2, goldAccent);
-      _drawPixelRect(canvas, 46 + offX, 32 + offY, 2, 2, goldAccent);
-      _drawPixelRect(canvas, 50 + offX, 32 + offY, 2, 2, goldAccent);
+      _drawEllipse(canvas, 49 + offX, 30 + offY, 3.5, 3.5, goldLight);
+      _drawDot(canvas, 49 + offX, 30 + offY, 1.5, goldAccent);
+      // Star points
+      _drawLine(canvas, 49 + offX, 26.5 + offY, 49 + offX, 33.5 + offY, goldAccent, width: 0.8);
+      _drawLine(canvas, 45.5 + offX, 30 + offY, 52.5 + offX, 30 + offY, goldAccent, width: 0.8);
+      _drawDot(canvas, 46.5 + offX, 27.5 + offY, 0.6, goldAccent);
+      _drawDot(canvas, 51.5 + offX, 27.5 + offY, 0.6, goldAccent);
+      _drawDot(canvas, 46.5 + offX, 32.5 + offY, 0.6, goldAccent);
+      _drawDot(canvas, 51.5 + offX, 32.5 + offY, 0.6, goldAccent);
       // Right star eye
-      _drawPixelRect(canvas, 74 + offX, 30 + offY, 6, 2, goldLight);
-      _drawPixelRect(canvas, 76 + offX, 28 + offY, 2, 6, goldLight);
-      _drawPixelRect(canvas, 76 + offX, 30 + offY, 2, 2, goldAccent);
-      _drawPixelRect(canvas, 74 + offX, 28 + offY, 2, 2, goldAccent);
-      _drawPixelRect(canvas, 78 + offX, 28 + offY, 2, 2, goldAccent);
-      _drawPixelRect(canvas, 74 + offX, 32 + offY, 2, 2, goldAccent);
-      _drawPixelRect(canvas, 78 + offX, 32 + offY, 2, 2, goldAccent);
+      _drawEllipse(canvas, 79 + offX, 30 + offY, 3.5, 3.5, goldLight);
+      _drawDot(canvas, 79 + offX, 30 + offY, 1.5, goldAccent);
+      _drawLine(canvas, 79 + offX, 26.5 + offY, 79 + offX, 33.5 + offY, goldAccent, width: 0.8);
+      _drawLine(canvas, 75.5 + offX, 30 + offY, 82.5 + offX, 30 + offY, goldAccent, width: 0.8);
+      _drawDot(canvas, 76.5 + offX, 27.5 + offY, 0.6, goldAccent);
+      _drawDot(canvas, 81.5 + offX, 27.5 + offY, 0.6, goldAccent);
+      _drawDot(canvas, 76.5 + offX, 32.5 + offY, 0.6, goldAccent);
+      _drawDot(canvas, 81.5 + offX, 32.5 + offY, 0.6, goldAccent);
     } else if (bigEyes) {
-      // Big round shocked eyes (12 wide, 10 tall)
+      // Big round shocked eyes - use smooth ellipses and circles
       // Left eye
-      _drawPixelRect(canvas, 42 + offX, 26 + offY, 14, 10, eyeWhite);
-      _drawPixelRect(canvas, 44 + offX, 28 + offY, 10, 8, eyeIris);
-      _drawPixelRect(canvas, 46 + offX, 30 + offY, 6, 4, eyeIrisDark);
-      _drawPixelRect(canvas, 48 + offX, 31 + offY, 2, 2, eyePupil);
-      _drawPixelRect(canvas, 44 + offX, 26 + offY, 4, 2, eyeHighlight);
-      _drawPixelRect(canvas, 46 + offX, 34 + offY, 8, 2, eyeLower);
-      // Upper eyelid line
-      _drawPixelRect(canvas, 42 + offX, 25 + offY, 14, 1, eyeIrisDark);
-      // Eyelashes
-      _drawPixelRect(canvas, 41 + offX, 25 + offY, 2, 2, eyeIrisDark);
-      _drawPixelRect(canvas, 55 + offX, 25 + offY, 2, 2, eyeIrisDark);
-      // Right eye
-      _drawPixelRect(canvas, 72 + offX, 26 + offY, 14, 10, eyeWhite);
-      _drawPixelRect(canvas, 74 + offX, 28 + offY, 10, 8, eyeIris);
-      _drawPixelRect(canvas, 76 + offX, 30 + offY, 6, 4, eyeIrisDark);
-      _drawPixelRect(canvas, 78 + offX, 31 + offY, 2, 2, eyePupil);
-      _drawPixelRect(canvas, 74 + offX, 26 + offY, 4, 2, eyeHighlight);
-      _drawPixelRect(canvas, 76 + offX, 34 + offY, 8, 2, eyeLower);
-      // Upper eyelid line
-      _drawPixelRect(canvas, 72 + offX, 25 + offY, 14, 1, eyeIrisDark);
-      // Eyelashes
-      _drawPixelRect(canvas, 71 + offX, 25 + offY, 2, 2, eyeIrisDark);
-      _drawPixelRect(canvas, 85 + offX, 25 + offY, 2, 2, eyeIrisDark);
-    } else if (closedEyes) {
-      // Peaceful closed eyes (curved arcs, scaled up)
-      _drawPixelRect(canvas, 44 + offX, 32 + offY, 10, 2, eyeIris);
-      _drawPixelRect(canvas, 46 + offX, 30 + offY, 6, 2, eyeIris);
-      _drawPixelRect(canvas, 74 + offX, 32 + offY, 10, 2, eyeIris);
-      _drawPixelRect(canvas, 76 + offX, 30 + offY, 6, 2, eyeIris);
-    } else {
-      // Normal big round purple eyes (10-12 wide, 8-10 tall, 6 layers)
-      // Left eye
-      // Layer 1: Eye white
-      _drawPixelRect(canvas, 44 + offX, 28 + offY, 12, 10, eyeWhite);
-      // Layer 2: Iris
-      _drawPixelRect(canvas, 46 + offX, 30 + offY, 8, 6, eyeIris);
-      // Layer 3: Dark iris
-      _drawPixelRect(canvas, 48 + offX, 31 + offY, 4, 4, eyeIrisDark);
-      // Layer 4: Pupil
-      _drawPixelRect(canvas, 49 + offX, 32 + offY, 2, 2, eyePupil);
-      // Layer 5: Highlight (top-left)
-      _drawPixelRect(canvas, 46 + offX, 28 + offY, 4, 2, eyeHighlight);
-      _drawPixelRect(canvas, 46 + offX, 28 + offY, 2, 1, eyeHighlight);
-      // Layer 6: Lower eyelid (aegyo sal)
-      _drawPixelRect(canvas, 46 + offX, 36 + offY, 8, 2, eyeLower);
-      // Upper eyelid line
-      _drawPixelRect(canvas, 44 + offX, 27 + offY, 12, 1, eyeIrisDark);
-      // Eyelashes
-      _drawPixelRect(canvas, 43 + offX, 27 + offY, 2, 2, eyeIrisDark);
-      _drawPixelRect(canvas, 55 + offX, 27 + offY, 2, 2, eyeIrisDark);
-      _drawPixelRect(canvas, 44 + offX, 26 + offY, 1, 1, eyeIrisDark);
+      _drawEllipse(canvas, 49 + offX, 31 + offY, 7, 5, eyeWhite);
+      _drawEllipse(canvas, 49 + offX, 32 + offY, 5, 4, eyeIris);
+      _drawEllipse(canvas, 49 + offX, 32 + offY, 3, 2, eyeIrisDark);
+      _drawDot(canvas, 49 + offX, 32 + offY, 1.2, eyePupil);
+      // Highlight
+      _drawDot(canvas, 46 + offX, 28 + offY, 1.5, eyeHighlight);
+      _drawDot(canvas, 47 + offX, 29 + offY, 0.7, eyeHighlight);
+      // Lower eyelid (aegyo sal) - smooth arc
+      _drawArc(canvas, 49 + offX, 35 + offY, 5, 1.5, 0.2, math.pi - 0.4, eyeLower, width: 1.0);
+      // Upper eyelid line - smooth arc
+      _drawArc(canvas, 49 + offX, 27 + offY, 7, 2, math.pi + 0.3, -math.pi - 0.6, eyeIrisDark, width: 1.0);
+      // Eyelashes - smooth dots
+      _drawDot(canvas, 42 + offX, 26 + offY, 0.8, eyeIrisDark);
+      _drawDot(canvas, 56 + offX, 26 + offY, 0.8, eyeIrisDark);
 
       // Right eye
-      // Layer 1: Eye white
-      _drawPixelRect(canvas, 72 + offX, 28 + offY, 12, 10, eyeWhite);
-      // Layer 2: Iris
-      _drawPixelRect(canvas, 74 + offX, 30 + offY, 8, 6, eyeIris);
-      // Layer 3: Dark iris
-      _drawPixelRect(canvas, 76 + offX, 31 + offY, 4, 4, eyeIrisDark);
-      // Layer 4: Pupil
-      _drawPixelRect(canvas, 77 + offX, 32 + offY, 2, 2, eyePupil);
-      // Layer 5: Highlight (top-left)
-      _drawPixelRect(canvas, 74 + offX, 28 + offY, 4, 2, eyeHighlight);
-      _drawPixelRect(canvas, 74 + offX, 28 + offY, 2, 1, eyeHighlight);
-      // Layer 6: Lower eyelid (aegyo sal)
-      _drawPixelRect(canvas, 74 + offX, 36 + offY, 8, 2, eyeLower);
+      _drawEllipse(canvas, 79 + offX, 31 + offY, 7, 5, eyeWhite);
+      _drawEllipse(canvas, 79 + offX, 32 + offY, 5, 4, eyeIris);
+      _drawEllipse(canvas, 79 + offX, 32 + offY, 3, 2, eyeIrisDark);
+      _drawDot(canvas, 79 + offX, 32 + offY, 1.2, eyePupil);
+      // Highlight
+      _drawDot(canvas, 76 + offX, 28 + offY, 1.5, eyeHighlight);
+      _drawDot(canvas, 77 + offX, 29 + offY, 0.7, eyeHighlight);
+      // Lower eyelid (aegyo sal)
+      _drawArc(canvas, 79 + offX, 35 + offY, 5, 1.5, 0.2, math.pi - 0.4, eyeLower, width: 1.0);
       // Upper eyelid line
-      _drawPixelRect(canvas, 72 + offX, 27 + offY, 12, 1, eyeIrisDark);
+      _drawArc(canvas, 79 + offX, 27 + offY, 7, 2, math.pi + 0.3, -math.pi - 0.6, eyeIrisDark, width: 1.0);
       // Eyelashes
-      _drawPixelRect(canvas, 71 + offX, 27 + offY, 2, 2, eyeIrisDark);
-      _drawPixelRect(canvas, 83 + offX, 27 + offY, 2, 2, eyeIrisDark);
-      _drawPixelRect(canvas, 83 + offX, 26 + offY, 1, 1, eyeIrisDark);
+      _drawDot(canvas, 72 + offX, 26 + offY, 0.8, eyeIrisDark);
+      _drawDot(canvas, 86 + offX, 26 + offY, 0.8, eyeIrisDark);
+    } else if (closedEyes) {
+      // Peaceful closed eyes - smooth arcs
+      _drawArc(canvas, 49 + offX, 33 + offY, 5, 2, math.pi + 0.3, -math.pi - 0.6, eyeIris, width: 1.2);
+      _drawArc(canvas, 79 + offX, 33 + offY, 5, 2, math.pi + 0.3, -math.pi - 0.6, eyeIris, width: 1.2);
+    } else {
+      // Normal big round purple eyes - use smooth ellipses and circles
+      // Left eye
+      // Eye white - ellipse
+      _drawEllipse(canvas, 50 + offX, 33 + offY, 6, 5, eyeWhite);
+      // Iris - ellipse
+      _drawEllipse(canvas, 50 + offX, 33 + offY, 4, 3.5, eyeIris);
+      // Dark iris - ellipse
+      _drawEllipse(canvas, 50 + offX, 33 + offY, 2.5, 2, eyeIrisDark);
+      // Pupil - dot
+      _drawDot(canvas, 50 + offX, 33 + offY, 1.2, eyePupil);
+      // Highlight (top-left) - dots
+      _drawDot(canvas, 47 + offX, 29.5 + offY, 1.3, eyeHighlight);
+      _drawDot(canvas, 47.5 + offX, 30.5 + offY, 0.6, eyeHighlight);
+      // Lower eyelid (aegyo sal) - smooth arc
+      _drawArc(canvas, 50 + offX, 37 + offY, 4.5, 1.2, 0.15, math.pi - 0.3, eyeLower, width: 1.0);
+      // Upper eyelid line - smooth arc
+      _drawArc(canvas, 50 + offX, 28 + offY, 6.5, 2, math.pi + 0.2, -math.pi - 0.4, eyeIrisDark, width: 1.0);
+      // Eyelashes - smooth dots
+      _drawDot(canvas, 43.5 + offX, 27 + offY, 0.8, eyeIrisDark);
+      _drawDot(canvas, 56 + offX, 27 + offY, 0.8, eyeIrisDark);
+      _drawDot(canvas, 44.5 + offX, 26 + offY, 0.6, eyeIrisDark);
+
+      // Right eye
+      // Eye white - ellipse
+      _drawEllipse(canvas, 78 + offX, 33 + offY, 6, 5, eyeWhite);
+      // Iris - ellipse
+      _drawEllipse(canvas, 78 + offX, 33 + offY, 4, 3.5, eyeIris);
+      // Dark iris - ellipse
+      _drawEllipse(canvas, 78 + offX, 33 + offY, 2.5, 2, eyeIrisDark);
+      // Pupil - dot
+      _drawDot(canvas, 78 + offX, 33 + offY, 1.2, eyePupil);
+      // Highlight (top-left) - dots
+      _drawDot(canvas, 75 + offX, 29.5 + offY, 1.3, eyeHighlight);
+      _drawDot(canvas, 75.5 + offX, 30.5 + offY, 0.6, eyeHighlight);
+      // Lower eyelid (aegyo sal) - smooth arc
+      _drawArc(canvas, 78 + offX, 37 + offY, 4.5, 1.2, 0.15, math.pi - 0.3, eyeLower, width: 1.0);
+      // Upper eyelid line - smooth arc
+      _drawArc(canvas, 78 + offX, 28 + offY, 6.5, 2, math.pi + 0.2, -math.pi - 0.4, eyeIrisDark, width: 1.0);
+      // Eyelashes - smooth dots
+      _drawDot(canvas, 71.5 + offX, 27 + offY, 0.8, eyeIrisDark);
+      _drawDot(canvas, 84 + offX, 27 + offY, 0.8, eyeIrisDark);
+      _drawDot(canvas, 83.5 + offX, 26 + offY, 0.6, eyeIrisDark);
     }
 
-    // Nose - 2 pixels
-    _drawPixelRect(canvas, 63 + offX, 38 + offY, 2, 2, skinShadow);
+    // Nose - smooth small dot
+    _drawDot(canvas, 64 + offX, 39 + offY, 0.8, skinShadow);
 
-    // Blush - elliptical 8x4
-    _drawPixelRect(canvas, 42 + offX, 36 + offY, 8, 4, blush);
-    _drawPixelRect(canvas, 44 + offX, 35 + offY, 4, 1, blush);
-    _drawPixelRect(canvas, 78 + offX, 36 + offY, 8, 4, blush);
-    _drawPixelRect(canvas, 80 + offX, 35 + offY, 4, 1, blush);
+    // Blush - smooth semi-transparent ellipses
+    _drawEllipse(canvas, 46 + offX, 37.5 + offY, 4, 2.5, blush.withValues(alpha: 0.3));
+    _drawEllipse(canvas, 82 + offX, 37.5 + offY, 4, 2.5, blush.withValues(alpha: 0.3));
 
     // Mouth
     if (openMouth) {
-      // O-shaped open mouth (scaled up)
-      _drawPixelRect(canvas, 58 + offX, 42 + offY, 8, 6, mouth);
-      _drawPixelRect(canvas, 60 + offX, 40 + offY, 4, 2, mouth);
-      _drawPixelRect(canvas, 60 + offX, 48 + offY, 4, 2, mouth);
-      _drawPixelRect(canvas, 60 + offX, 42 + offY, 4, 4, skinDark);
-      _drawPixelRect(canvas, 61 + offX, 43 + offY, 2, 2, skinDark);
+      // O-shaped open mouth - smooth ellipse
+      _drawEllipse(canvas, 62 + offX, 44 + offY, 4, 5, mouth);
+      _drawEllipse(canvas, 62 + offX, 44 + offY, 2.5, 3, skinDark);
     } else if (wavyMouth) {
-      // Wavy confused mouth (scaled up)
-      _drawPixelRect(canvas, 56 + offX, 42 + offY, 4, 2, mouth);
-      _drawPixelRect(canvas, 62 + offX, 44 + offY, 4, 2, mouth);
-      _drawPixelRect(canvas, 68 + offX, 42 + offY, 4, 2, mouth);
+      // Wavy confused mouth - smooth arcs
+      _drawArc(canvas, 58 + offX, 43 + offY, 2, 1, math.pi + 0.3, -math.pi - 0.6, mouth, width: 1.0);
+      _drawArc(canvas, 64 + offX, 45 + offY, 2, 1, 0.3, math.pi - 0.6, mouth, width: 1.0);
+      _drawArc(canvas, 70 + offX, 43 + offY, 2, 1, math.pi + 0.3, -math.pi - 0.6, mouth, width: 1.0);
     } else if (bigSmile) {
-      // Big arc smile (scaled up)
-      _drawPixelRect(canvas, 54 + offX, 42 + offY, 16, 2, mouth);
-      _drawPixelRect(canvas, 52 + offX, 40 + offY, 2, 2, mouth);
-      _drawPixelRect(canvas, 70 + offX, 40 + offY, 2, 2, mouth);
-      _drawPixelRect(canvas, 56 + offX, 44 + offY, 12, 2, mouth);
-      _drawPixelRect(canvas, 58 + offX, 44 + offY, 8, 2, skinDark);
+      // Big arc smile - smooth arc
+      _drawArc(canvas, 62 + offX, 40 + offY, 10, 5, 0.3, math.pi - 0.6, mouth, width: 1.2);
+      // Inner mouth shadow
+      _drawArc(canvas, 62 + offX, 41 + offY, 6, 3, 0.4, math.pi - 0.8, skinDark, width: 0.8);
     } else {
-      // Omega-shaped smile (5-6 pixels wide, scaled up)
-      _drawPixelRect(canvas, 58 + offX, 42 + offY, 8, 2, mouth);
-      _drawPixelRect(canvas, 56 + offX, 40 + offY, 2, 2, mouth);
-      _drawPixelRect(canvas, 66 + offX, 40 + offY, 2, 2, mouth);
-      _drawPixelRect(canvas, 60 + offX, 44 + offY, 4, 2, mouth);
+      // Omega-shaped smile - smooth arcs for the omega shape
+      // Left curve of omega
+      _drawArc(canvas, 58 + offX, 42 + offY, 2.5, 2, math.pi + 0.2, -math.pi - 0.4, mouth, width: 1.0);
+      // Right curve of omega
+      _drawArc(canvas, 66 + offX, 42 + offY, 2.5, 2, math.pi + 0.2, -math.pi - 0.4, mouth, width: 1.0);
+      // Bottom connecting arc
+      _drawArc(canvas, 62 + offX, 44 + offY, 3, 1.5, 0.2, math.pi - 0.4, mouth, width: 1.0);
     }
   }
 
@@ -572,27 +677,35 @@ class CatGirlPainter extends CustomPainter {
     // Coat bottom shadow
     _drawPixelRect(canvas, 42 + offX, 76 + offY, 44, 4, clothDark);
 
+    // Blend pixels at body contour edges
+    _drawBlendPixel(canvas, 37 + offX, 55 + offY, clothDark, alpha: 0.2);
+    _drawBlendPixel(canvas, 37 + offX, 65 + offY, clothDark, alpha: 0.15);
+    _drawBlendPixel(canvas, 90 + offX, 55 + offY, clothDark, alpha: 0.2);
+    _drawBlendPixel(canvas, 90 + offX, 65 + offY, clothDark, alpha: 0.15);
+    _drawBlendPixel(canvas, 50 + offX, 79 + offY, clothDark, alpha: 0.2);
+    _drawBlendPixel(canvas, 70 + offX, 79 + offY, clothDark, alpha: 0.2);
+
     // Collar / neckline with white inner collar
     _drawPixelRect(canvas, 46 + offX, 48 + offY, 36, 4, clothLight);
     _drawPixelRect(canvas, 50 + offX, 48 + offY, 28, 2, skinBase);
     // White inner collar peek
     _drawPixelRect(canvas, 52 + offX, 49 + offY, 24, 2, skinLight);
 
-    // Ribbon at collar (scaled up)
-    _drawPixelRect(canvas, 58 + offX, 48 + offY, 8, 6, ribbon);
-    _drawPixelRect(canvas, 56 + offX, 50 + offY, 2, 2, ribbon);
-    _drawPixelRect(canvas, 66 + offX, 50 + offY, 2, 2, ribbon);
-    _drawPixelRect(canvas, 60 + offX, 52 + offY, 4, 2, goldAccent);
-    // Ribbon tails
-    _drawPixelRect(canvas, 58 + offX, 54 + offY, 2, 4, ribbon);
-    _drawPixelRect(canvas, 64 + offX, 54 + offY, 2, 4, ribbon);
+    // Ribbon at collar - use ellipse + dot for smooth bow
+    _drawEllipse(canvas, 62 + offX, 50 + offY, 4, 2.5, ribbon);
+    _drawEllipse(canvas, 57 + offX, 51 + offY, 2, 1.5, ribbon);
+    _drawEllipse(canvas, 67 + offX, 51 + offY, 2, 1.5, ribbon);
+    _drawDot(canvas, 62 + offX, 51 + offY, 1.2, goldAccent);
+    // Ribbon tails - smooth lines
+    _drawLine(canvas, 59 + offX, 52 + offY, 58 + offX, 57 + offY, ribbon, width: 1.2);
+    _drawLine(canvas, 65 + offX, 52 + offY, 66 + offX, 57 + offY, ribbon, width: 1.2);
 
-    // Gold embroidery lines (scaled up)
-    _drawPixelRect(canvas, 44 + offX, 54 + offY, 2, 12, goldAccent);
-    _drawPixelRect(canvas, 82 + offX, 54 + offY, 2, 12, goldAccent);
-    _drawPixelRect(canvas, 48 + offX, 64 + offY, 32, 2, goldAccent);
+    // Gold embroidery lines - smooth lines
+    _drawLine(canvas, 45 + offX, 54 + offY, 45 + offX, 66 + offY, goldAccent, width: 0.8);
+    _drawLine(canvas, 83 + offX, 54 + offY, 83 + offX, 66 + offY, goldAccent, width: 0.8);
+    _drawLine(canvas, 48 + offX, 65 + offY, 80 + offX, 65 + offY, goldAccent, width: 0.8);
     // Additional gold detail
-    _drawPixelRect(canvas, 50 + offX, 68 + offY, 28, 1, goldLight);
+    _drawLine(canvas, 50 + offX, 68.5 + offY, 78 + offX, 68.5 + offY, goldLight, width: 0.6);
 
     // Arms
     _drawPixelRect(canvas, 32 + offX, 54 + offY, 6, 20, clothBase);
@@ -607,9 +720,13 @@ class CatGirlPainter extends CustomPainter {
     _drawPixelRect(canvas, 94 + offX, 74 + offY, 2, 2, skinLight);
     _drawPixelRect(canvas, 94 + offX, 76 + offY, 2, 2, skinShadow);
 
-    // Gold armbands
-    _drawPixelRect(canvas, 32 + offX, 54 + offY, 6, 2, goldAccent);
-    _drawPixelRect(canvas, 90 + offX, 54 + offY, 6, 2, goldAccent);
+    // Blend at arm edges
+    _drawBlendPixel(canvas, 31 + offX, 60 + offY, clothDark, alpha: 0.2);
+    _drawBlendPixel(canvas, 97 + offX, 60 + offY, clothDark, alpha: 0.2);
+
+    // Gold armbands - smooth lines
+    _drawLine(canvas, 32 + offX, 55 + offY, 38 + offX, 55 + offY, goldAccent, width: 1.0);
+    _drawLine(canvas, 90 + offX, 55 + offY, 96 + offX, 55 + offY, goldAccent, width: 1.0);
   }
 
   // ============================================================
@@ -634,12 +751,16 @@ class CatGirlPainter extends CustomPainter {
     // Shoe top detail
     _drawPixelRect(canvas, 44 + offX, 94 + offY, 12, 2, clothBase);
     _drawPixelRect(canvas, 72 + offX, 94 + offY, 12, 2, clothBase);
-    // Gold buckles
-    _drawPixelRect(canvas, 48 + offX, 94 + offY, 4, 2, goldAccent);
-    _drawPixelRect(canvas, 76 + offX, 94 + offY, 4, 2, goldAccent);
+    // Gold buckles - smooth dots
+    _drawDot(canvas, 50 + offX, 95 + offY, 1.5, goldAccent);
+    _drawDot(canvas, 78 + offX, 95 + offY, 1.5, goldAccent);
     // Shoe sole
     _drawPixelRect(canvas, 44 + offX, 98 + offY, 12, 2, hairDark);
     _drawPixelRect(canvas, 72 + offX, 98 + offY, 12, 2, hairDark);
+
+    // Blend at leg-shoe transition
+    _drawBlendPixel(canvas, 46 + offX, 93 + offY, skinShadow, alpha: 0.2);
+    _drawBlendPixel(canvas, 74 + offX, 93 + offY, skinShadow, alpha: 0.2);
   }
 
   // ============================================================
@@ -652,8 +773,11 @@ class CatGirlPainter extends CustomPainter {
     _drawPixelRect(canvas, 6 + offX + wagX, 56 + offY, 4, 2, hairLight);
     // Tail tip
     _drawPixelRect(canvas, 4 + offX + wagX, 54 + offY, 4, 2, hairLight);
-    // Tail highlight
-    _drawPixelRect(canvas, 8 + offX + wagX, 58 + offY, 2, 2, hairLight);
+    // Tail highlight - smooth line
+    _drawLine(canvas, 9 + offX + wagX, 58 + offY, 9 + offX + wagX, 60 + offY, hairLight, width: 0.8);
+
+    // Blend at tail base
+    _drawBlendPixel(canvas, 10 + offX + wagX, 61 + offY, hairShadow, alpha: 0.25);
   }
 
   // ============================================================
@@ -713,9 +837,9 @@ class CatGirlPainter extends CustomPainter {
     _drawPixelRect(canvas, 28, 26 + bounce, 2, 2, skinLight);
     _drawPixelRect(canvas, 94, 26 + bounce, 6, 4, skinBase);
     _drawPixelRect(canvas, 98, 26 + bounce, 2, 2, skinLight);
-    // Gold armbands
-    _drawPixelRect(canvas, 32, 34 + bounce, 6, 2, goldAccent);
-    _drawPixelRect(canvas, 90, 34 + bounce, 6, 2, goldAccent);
+    // Gold armbands - smooth lines
+    _drawLine(canvas, 32, 35 + bounce, 38, 35 + bounce, goldAccent, width: 1.0);
+    _drawLine(canvas, 90, 35 + bounce, 96, 35 + bounce, goldAccent, width: 1.0);
 
     // Head / Face with star eyes and big smile
     _drawFace(canvas, 0, bounce, starEyes: true, bigSmile: true);
@@ -726,12 +850,12 @@ class CatGirlPainter extends CustomPainter {
     // Cat ears
     _drawEars(canvas, 0, bounce);
 
-    // Sparkles
+    // Sparkles - smooth dots
     if (frame % 2 == 0) {
-      _drawPixelRect(canvas, 20, 16 + bounce, 2, 2, goldLight);
-      _drawPixelRect(canvas, 104, 20 + bounce, 2, 2, goldLight);
-      _drawPixelRect(canvas, 14, 36 + bounce, 2, 2, goldAccent);
-      _drawPixelRect(canvas, 108, 32 + bounce, 2, 2, goldAccent);
+      _drawDot(canvas, 21, 17 + bounce, 1.2, goldLight);
+      _drawDot(canvas, 105, 21 + bounce, 1.2, goldLight);
+      _drawDot(canvas, 15, 37 + bounce, 1.0, goldAccent);
+      _drawDot(canvas, 109, 33 + bounce, 1.0, goldAccent);
     }
   }
 
@@ -756,11 +880,11 @@ class CatGirlPainter extends CustomPainter {
     _drawPixelRect(canvas, 32, 54, 6, 20, clothBase);
     _drawPixelRect(canvas, 32, 54, 2, 8, clothLight);
     _drawPixelRect(canvas, 32, 74, 6, 4, skinBase);
-    _drawPixelRect(canvas, 32, 54, 6, 2, goldAccent);
+    _drawLine(canvas, 32, 55, 38, 55, goldAccent, width: 1.0);
     _drawPixelRect(canvas, 90, 30, 6, 16, clothBase);
     _drawPixelRect(canvas, 94, 30, 2, 6, clothLight);
     _drawPixelRect(canvas, 90, 46, 6, 4, skinBase);
-    _drawPixelRect(canvas, 90, 30, 6, 2, goldAccent);
+    _drawLine(canvas, 90, 31, 96, 31, goldAccent, width: 1.0);
 
     // Head / Face with wavy mouth
     _drawFace(canvas, tilt, 0, wavyMouth: true);
@@ -771,15 +895,11 @@ class CatGirlPainter extends CustomPainter {
     // Cat ears - right ear droopy
     _drawEars(canvas, tilt, 0, rightDroopy: true);
 
-    // Question mark (scaled up)
-    _drawPixelRect(canvas, 98, 10, 2, 2, goldAccent);
-    _drawPixelRect(canvas, 100, 10, 2, 2, goldAccent);
-    _drawPixelRect(canvas, 100, 12, 2, 2, goldAccent);
-    _drawPixelRect(canvas, 100, 14, 2, 2, goldAccent);
-    _drawPixelRect(canvas, 100, 16, 2, 2, goldAccent);
-    _drawPixelRect(canvas, 98, 18, 2, 2, goldAccent);
-    _drawPixelRect(canvas, 98, 20, 2, 2, goldAccent);
-    _drawPixelRect(canvas, 100, 20, 2, 2, goldAccent);
+    // Question mark - smooth line + dot
+    _drawLine(canvas, 99, 10, 101, 10, goldAccent, width: 1.2);
+    _drawLine(canvas, 101, 10, 101, 16, goldAccent, width: 1.2);
+    _drawLine(canvas, 101, 16, 99, 18, goldAccent, width: 1.2);
+    _drawDot(canvas, 99.5, 20.5, 0.8, goldAccent);
   }
 
   // ============================================================
@@ -821,14 +941,14 @@ class CatGirlPainter extends CustomPainter {
     // Cat ears (alert)
     _drawEars(canvas, -slideX, 0);
 
-    // Sweat drop (scaled up)
-    _drawPixelRect(canvas, 94 - slideX, 24, 4, 6, Color(0xFF66CCFF));
-    _drawPixelRect(canvas, 94 - slideX, 22, 2, 2, Color(0xFF88DDFF));
-    _drawPixelRect(canvas, 96 - slideX, 20, 2, 2, Color(0xFFAAEEFF));
+    // Sweat drop - smooth ellipse
+    _drawEllipse(canvas, 96 - slideX, 24, 2, 3, Color(0xFF66CCFF));
+    _drawDot(canvas, 95 - slideX, 21, 1, Color(0xFF88DDFF));
+    _drawDot(canvas, 97 - slideX, 19, 0.7, Color(0xFFAAEEFF));
 
-    // Motion lines
+    // Motion lines - smooth lines
     for (int i = 0; i < 3; i++) {
-      _drawPixelRect(canvas, 106 + i * 4 - slideX, 36 + i * 8, 2, 6, Color(0xFFFFFFFF).withValues(alpha: 0.5));
+      _drawLine(canvas, 107 + i * 4 - slideX, 36 + i * 8, 107 + i * 4 - slideX, 42 + i * 8, Color(0xFFFFFFFF).withValues(alpha: 0.5), width: 0.8);
     }
   }
 
@@ -852,6 +972,10 @@ class CatGirlPainter extends CustomPainter {
     // Body shadow
     _drawPixelRect(canvas, 16, 74 + breathe, 68, 4, clothDark);
 
+    // Blend at body edges
+    _drawBlendPixel(canvas, 15, 68 + breathe, clothDark, alpha: 0.2);
+    _drawBlendPixel(canvas, 84, 68 + breathe, clothDark, alpha: 0.2);
+
     // Head (resting on side)
     _drawPixelRect(canvas, 8, 54 + breathe, 24, 16, skinBase);
     _drawPixelRect(canvas, 12, 54 + breathe, 12, 4, skinLight);
@@ -867,29 +991,28 @@ class CatGirlPainter extends CustomPainter {
 
     // Cat ear (one visible)
     _drawPixelRect(canvas, 8, 46 + breathe, 6, 4, hairBase);
-    _drawPixelRect(canvas, 10, 46 + breathe, 2, 2, earInner);
-    _drawPixelRect(canvas, 10, 48 + breathe, 2, 2, earFur);
+    _drawEllipse(canvas, 11 + 0, 47 + breathe, 1.5, 1, earInner);
+    _drawEllipse(canvas, 11 + 0, 49 + breathe, 1, 0.8, earFur);
 
-    // Closed eyes (peaceful arcs)
-    _drawPixelRect(canvas, 14, 60 + breathe, 8, 2, eyeIris);
-    _drawPixelRect(canvas, 16, 58 + breathe, 4, 2, eyeIris);
+    // Closed eyes (peaceful arcs) - smooth arcs
+    _drawArc(canvas, 18 + 0, 61 + breathe, 4, 1.5, math.pi + 0.3, -math.pi - 0.6, eyeIris, width: 1.2);
 
-    // Peaceful mouth
-    _drawPixelRect(canvas, 16, 64 + breathe, 6, 2, mouth);
+    // Peaceful mouth - smooth arc
+    _drawArc(canvas, 19 + 0, 65 + breathe, 3, 1, 0.3, math.pi - 0.6, mouth, width: 0.8);
 
-    // Blush
-    _drawPixelRect(canvas, 12, 62 + breathe, 6, 2, blush);
-    _drawPixelRect(canvas, 24, 62 + breathe, 6, 2, blush);
+    // Blush - smooth semi-transparent ellipses
+    _drawEllipse(canvas, 15 + 0, 63 + breathe, 3, 1.2, blush.withValues(alpha: 0.25));
+    _drawEllipse(canvas, 27 + 0, 63 + breathe, 3, 1.2, blush.withValues(alpha: 0.25));
 
     // Feet
     _drawPixelRect(canvas, 82, 68 + breathe, 8, 6, skinBase);
     _drawPixelRect(canvas, 82, 72 + breathe, 8, 2, skinShadow);
 
-    // Zzz (floating, scaled up)
-    _drawPixelRect(canvas, 36, 46 + breathe, 4, 4, goldLight);
-    _drawPixelRect(canvas, 42, 40 + breathe, 4, 4, goldLight);
-    _drawPixelRect(canvas, 48, 34 + breathe, 6, 4, goldLight);
-    _drawPixelRect(canvas, 56, 28 + breathe, 6, 4, goldLight);
+    // Zzz (floating) - smooth dots
+    _drawDot(canvas, 38, 48 + breathe, 1.5, goldLight);
+    _drawDot(canvas, 44, 42 + breathe, 1.8, goldLight);
+    _drawDot(canvas, 51, 36 + breathe, 2.2, goldLight);
+    _drawDot(canvas, 59, 30 + breathe, 2.5, goldLight);
   }
 
   // ============================================================
@@ -905,6 +1028,10 @@ class CatGirlPainter extends CustomPainter {
     // Gold belt
     _drawPixelRect(canvas, 32, 72 + frame * 0.5, 64, 2, goldAccent);
     _drawPixelRect(canvas, 36, 74 + frame * 0.5, 56, 1, goldLight);
+
+    // Blend at body edges
+    _drawBlendPixel(canvas, 23, 72 + frame * 0.5, clothDark, alpha: 0.2);
+    _drawBlendPixel(canvas, 104, 72 + frame * 0.5, clothDark, alpha: 0.2);
 
     // Arms (spread out)
     _drawPixelRect(canvas, 12, 72, 12, 4, clothBase);
@@ -922,6 +1049,10 @@ class CatGirlPainter extends CustomPainter {
     _drawPixelRect(canvas, 36, 62, 56, 4, skinShadow);
     _drawPixelRect(canvas, 40, 64, 48, 2, skinDark);
 
+    // Blend at face edges
+    _drawBlendPixel(canvas, 27, 50, skinShadow, alpha: 0.2);
+    _drawBlendPixel(canvas, 100, 50, skinShadow, alpha: 0.2);
+
     // Hair (spread out)
     _drawPixelRect(canvas, 24, 34, 80, 12, hairBase);
     _drawPixelRect(canvas, 32, 34, 28, 4, hairLight);
@@ -929,35 +1060,35 @@ class CatGirlPainter extends CustomPainter {
     _drawPixelRect(canvas, 24, 42, 4, 16, hairBase);
     _drawPixelRect(canvas, 100, 42, 4, 16, hairBase);
     _drawPixelRect(canvas, 24, 42, 80, 2, hairDark);
-    // Hair highlight lines
-    _drawPixelRect(canvas, 36, 36, 2, 4, hairLight);
-    _drawPixelRect(canvas, 68, 38, 2, 4, hairLight);
+    // Hair highlight lines - smooth lines
+    _drawLine(canvas, 37, 36, 37, 40, hairLight, width: 0.8);
+    _drawLine(canvas, 69, 38, 69, 42, hairLight, width: 0.8);
 
     // Cat ears (flattened)
     _drawPixelRect(canvas, 20, 30, 12, 6, hairBase);
-    _drawPixelRect(canvas, 24, 30, 6, 4, earInner);
-    _drawPixelRect(canvas, 24, 32, 4, 2, earFur);
+    _drawEllipse(canvas, 27, 32, 3, 2, earInner);
+    _drawEllipse(canvas, 27, 33, 2, 1, earFur);
     _drawPixelRect(canvas, 96, 30, 12, 6, hairBase);
-    _drawPixelRect(canvas, 100, 30, 6, 4, earInner);
-    _drawPixelRect(canvas, 100, 32, 4, 2, earFur);
+    _drawEllipse(canvas, 103, 32, 3, 2, earInner);
+    _drawEllipse(canvas, 103, 33, 2, 1, earFur);
 
-    // X_X eyes (scaled up)
-    _drawPixelRect(canvas, 42, 50, 2, 2, eyeIris);
-    _drawPixelRect(canvas, 48, 50, 2, 2, eyeIris);
-    _drawPixelRect(canvas, 45, 52, 2, 2, eyeIris);
-    _drawPixelRect(canvas, 39, 52, 2, 2, eyeIris);
-    _drawPixelRect(canvas, 82, 50, 2, 2, eyeIris);
-    _drawPixelRect(canvas, 88, 50, 2, 2, eyeIris);
-    _drawPixelRect(canvas, 85, 52, 2, 2, eyeIris);
-    _drawPixelRect(canvas, 79, 52, 2, 2, eyeIris);
+    // X_X eyes - smooth lines
+    _drawLine(canvas, 43, 51, 49, 51, eyeIris, width: 1.2);
+    _drawLine(canvas, 49, 51, 45, 53, eyeIris, width: 1.2);
+    _drawLine(canvas, 45, 53, 39, 53, eyeIris, width: 1.2);
+    _drawLine(canvas, 39, 53, 43, 51, eyeIris, width: 1.2);
+    _drawLine(canvas, 83, 51, 89, 51, eyeIris, width: 1.2);
+    _drawLine(canvas, 89, 51, 85, 53, eyeIris, width: 1.2);
+    _drawLine(canvas, 85, 53, 79, 53, eyeIris, width: 1.2);
+    _drawLine(canvas, 79, 53, 83, 51, eyeIris, width: 1.2);
 
-    // Wavy mouth
-    _drawPixelRect(canvas, 54, 56, 6, 2, mouth);
-    _drawPixelRect(canvas, 66, 56, 6, 2, mouth);
+    // Wavy mouth - smooth arcs
+    _drawArc(canvas, 57, 57, 3, 1, math.pi + 0.3, -math.pi - 0.6, mouth, width: 1.0);
+    _drawArc(canvas, 69, 57, 3, 1, math.pi + 0.3, -math.pi - 0.6, mouth, width: 1.0);
 
-    // Blush (8x4)
-    _drawPixelRect(canvas, 38, 54, 8, 4, blush);
-    _drawPixelRect(canvas, 84, 54, 8, 4, blush);
+    // Blush - smooth semi-transparent ellipses
+    _drawEllipse(canvas, 42, 56, 4, 2.5, blush.withValues(alpha: 0.3));
+    _drawEllipse(canvas, 88, 56, 4, 2.5, blush.withValues(alpha: 0.3));
 
     // Legs (spread)
     _drawPixelRect(canvas, 32, 86, 8, 6, skinBase);
@@ -990,8 +1121,8 @@ class CatGirlPainter extends CustomPainter {
     _drawPixelRect(canvas, 100 + shake, 34, 4, 4, clothBase);
     _drawPixelRect(canvas, 100 + shake, 32, 4, 4, skinBase);
     _drawPixelRect(canvas, 102 + shake, 32, 2, 2, skinLight);
-    _drawPixelRect(canvas, 26 + shake, 38, 6, 2, goldAccent);
-    _drawPixelRect(canvas, 96 + shake, 38, 6, 2, goldAccent);
+    _drawLine(canvas, 26 + shake, 39, 32 + shake, 39, goldAccent, width: 1.0);
+    _drawLine(canvas, 96 + shake, 39, 102 + shake, 39, goldAccent, width: 1.0);
 
     // Head / Face with big eyes and O mouth
     _drawFace(canvas, shake, 0, bigEyes: true, openMouth: true);
@@ -1002,18 +1133,18 @@ class CatGirlPainter extends CustomPainter {
     // Cat ears (straight up, alert)
     _drawEars(canvas, shake, 0);
 
-    // Sweat drops (scaled up)
-    _drawPixelRect(canvas, 94 + shake, 20, 4, 6, Color(0xFF66CCFF));
-    _drawPixelRect(canvas, 94 + shake, 18, 2, 2, Color(0xFF88DDFF));
-    _drawPixelRect(canvas, 96 + shake, 16, 2, 2, Color(0xFFAAEEFF));
-    _drawPixelRect(canvas, 38 + shake, 20, 2, 4, Color(0xFF66CCFF));
-    _drawPixelRect(canvas, 38 + shake, 18, 2, 2, Color(0xFF88DDFF));
+    // Sweat drops - smooth ellipses
+    _drawEllipse(canvas, 96 + shake, 23, 2, 3, Color(0xFF66CCFF));
+    _drawDot(canvas, 95 + shake, 19, 1, Color(0xFF88DDFF));
+    _drawDot(canvas, 97 + shake, 17, 0.7, Color(0xFFAAEEFF));
+    _drawEllipse(canvas, 39 + shake, 22, 1.5, 2, Color(0xFF66CCFF));
+    _drawDot(canvas, 39 + shake, 19, 0.8, Color(0xFF88DDFF));
 
-    // Exclamation marks (scaled up)
-    _drawPixelRect(canvas, 102, 8, 2, 6, goldAccent);
-    _drawPixelRect(canvas, 102, 16, 2, 2, goldAccent);
-    _drawPixelRect(canvas, 108, 10, 2, 6, goldAccent);
-    _drawPixelRect(canvas, 108, 18, 2, 2, goldAccent);
+    // Exclamation marks - smooth lines + dots
+    _drawLine(canvas, 103, 8, 103, 16, goldAccent, width: 1.2);
+    _drawDot(canvas, 103, 17, 0.8, goldAccent);
+    _drawLine(canvas, 109, 10, 109, 18, goldAccent, width: 1.2);
+    _drawDot(canvas, 109, 19, 0.8, goldAccent);
   }
 
   // ============================================================
@@ -1049,10 +1180,10 @@ class CatGirlPainter extends CustomPainter {
       _drawPixelRect(canvas, 22, 22 + jumpHeight, 6, 6, clothBase);
       _drawPixelRect(canvas, 22, 20 + jumpHeight, 6, 4, skinBase);
       _drawPixelRect(canvas, 22, 20 + jumpHeight, 2, 2, skinLight);
-      _drawPixelRect(canvas, 26, 30 + jumpHeight, 6, 2, goldAccent);
+      _drawLine(canvas, 26, 31 + jumpHeight, 32, 31 + jumpHeight, goldAccent, width: 1.0);
       _drawPixelRect(canvas, 96, 54 + jumpHeight, 6, 16, clothBase);
       _drawPixelRect(canvas, 96, 70 + jumpHeight, 6, 4, skinBase);
-      _drawPixelRect(canvas, 96, 54 + jumpHeight, 6, 2, goldAccent);
+      _drawLine(canvas, 96, 55 + jumpHeight, 102, 55 + jumpHeight, goldAccent, width: 1.0);
     } else {
       // Right arm up, left arm out
       _drawPixelRect(canvas, 96, 30 + jumpHeight, 6, 20, clothBase);
@@ -1061,10 +1192,10 @@ class CatGirlPainter extends CustomPainter {
       _drawPixelRect(canvas, 100, 22 + jumpHeight, 6, 6, clothBase);
       _drawPixelRect(canvas, 100, 20 + jumpHeight, 6, 4, skinBase);
       _drawPixelRect(canvas, 104, 20 + jumpHeight, 2, 2, skinLight);
-      _drawPixelRect(canvas, 96, 30 + jumpHeight, 6, 2, goldAccent);
+      _drawLine(canvas, 96, 31 + jumpHeight, 102, 31 + jumpHeight, goldAccent, width: 1.0);
       _drawPixelRect(canvas, 26, 54 + jumpHeight, 6, 16, clothBase);
       _drawPixelRect(canvas, 26, 70 + jumpHeight, 6, 4, skinBase);
-      _drawPixelRect(canvas, 26, 54 + jumpHeight, 6, 2, goldAccent);
+      _drawLine(canvas, 26, 55 + jumpHeight, 32, 55 + jumpHeight, goldAccent, width: 1.0);
     }
 
     // Head / Face with star eyes and big smile
@@ -1076,17 +1207,17 @@ class CatGirlPainter extends CustomPainter {
     // Cat ears
     _drawEars(canvas, 0, jumpHeight);
 
-    // Sparkles around (scaled up)
+    // Sparkles around - smooth dots
     if (frame % 2 == 0) {
-      _drawPixelRect(canvas, 12, 12 + jumpHeight, 4, 4, goldLight);
-      _drawPixelRect(canvas, 112, 16 + jumpHeight, 4, 4, goldLight);
-      _drawPixelRect(canvas, 8, 38 + jumpHeight, 2, 2, goldAccent);
-      _drawPixelRect(canvas, 116, 32 + jumpHeight, 2, 2, goldAccent);
+      _drawDot(canvas, 14, 14 + jumpHeight, 1.5, goldLight);
+      _drawDot(canvas, 114, 18 + jumpHeight, 1.5, goldLight);
+      _drawDot(canvas, 9, 39 + jumpHeight, 1.0, goldAccent);
+      _drawDot(canvas, 117, 33 + jumpHeight, 1.0, goldAccent);
     } else {
-      _drawPixelRect(canvas, 16, 24 + jumpHeight, 2, 2, goldLight);
-      _drawPixelRect(canvas, 108, 10 + jumpHeight, 2, 2, goldLight);
-      _drawPixelRect(canvas, 10, 50 + jumpHeight, 2, 2, goldAccent);
-      _drawPixelRect(canvas, 114, 44 + jumpHeight, 2, 2, goldAccent);
+      _drawDot(canvas, 17, 25 + jumpHeight, 1.0, goldLight);
+      _drawDot(canvas, 109, 11 + jumpHeight, 1.0, goldLight);
+      _drawDot(canvas, 11, 51 + jumpHeight, 1.0, goldAccent);
+      _drawDot(canvas, 115, 45 + jumpHeight, 1.0, goldAccent);
     }
   }
 
