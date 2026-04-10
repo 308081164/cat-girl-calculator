@@ -96,13 +96,13 @@ class DisplayArea extends StatelessWidget {
   double _getCatLeft(CalculatorState state, double screenWidth) {
     switch (state.catState) {
       case CatState.pushedAway:
-        return -60;
+        return -80;
       case CatState.squished:
         return 10;
       case CatState.shocked:
-        return screenWidth * 0.5 + 20;
+        return screenWidth * 0.5 + 10;
       default:
-        return screenWidth * 0.05;
+        return screenWidth * 0.02;
     }
   }
 
