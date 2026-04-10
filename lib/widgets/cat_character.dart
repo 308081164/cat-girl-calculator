@@ -73,8 +73,8 @@ class _CatCharacterState extends State<CatCharacter> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 96,
-      height: 96,
+      width: 160,
+      height: 160,
       child: CustomPaint(
         painter: CatGirlPainter(
           state: widget.catState,
@@ -91,27 +91,53 @@ class CatGirlPainter extends CustomPainter {
 
   CatGirlPainter({required this.state, required this.frame});
 
-  // === Pepe-style color palette: Egyptian/desert theme ===
-  static const hairColor = Color(0xFFD4A017);     // Golden hair
-  static const skinColor = Color(0xFFF5DEB3);     // Wheat skin
-  static const eyeColor = Color(0xFF1E90FF);      // Blue eyes
-  static const dressColor = Color(0xFF2C3E50);    // Dark blue-gray dress
-  static const earInnerColor = Color(0xFFFFDAB9); // Light skin ear inner
-  static const tailColor = Color(0xFFD4A017);     // Golden tail
-  static const mouthColor = Color(0xFFE8836B);    // Coral mouth
-  static const blushColor = Color(0xFFFFAA88);    // Warm blush
-  static const goldAccent = Color(0xFFFFD700);    // Gold decoration (new)
+  // === Kawaii Cat Girl Color Palette ===
 
-  // Darker shade for hair shading
-  static const hairDark = Color(0xFFB8860B);
-  // Dress accent / collar
-  static const dressAccent = Color(0xFF34495E);
-  // Sandal color
-  static const sandalColor = Color(0xFF8B7355);
+  // Hair - golden/light brown, 4 layers
+  static const hairLight = Color(0xFFF5D585);   // golden highlight
+  static const hairBase = Color(0xFFD4A040);    // golden base
+  static const hairDark = Color(0xFFB08030);    // dark golden shadow
+  static const hairShadow = Color(0xFF8B6914);  // deepest shadow
+
+  // Face - warm pink skin, 4 layers
+  static const skinLight = Color(0xFFFFF5E5);   // highlight (cream white)
+  static const skinBase = Color(0xFFF5D5C5);    // base (warm pink)
+  static const skinShadow = Color(0xFFE5B5A5);  // shadow (reddish brown)
+  static const skinDark = Color(0xFFD5A595);    // deep shadow
+
+  // Eyes - purple big round eyes, 6 layers
+  static const eyeWhite = Color(0xFFE5F0FF);    // eye white (blue-white)
+  static const eyeIris = Color(0xFFA5B5E5);     // iris (light purple)
+  static const eyeIrisDark = Color(0xFF7585C5); // iris dark
+  static const eyePupil = Color(0xFF454565);    // pupil (near-black purple)
+  static const eyeHighlight = Color(0xFFFFFFFF); // highlight (pure white)
+  static const eyeLower = Color(0xFFC5D0E5);    // lower eyelid (aegyo sal)
+
+  // Blush
+  static const blush = Color(0xFFF5A5B5);       // pink blush
+
+  // Mouth - omega smile
+  static const mouth = Color(0xFFE8836B);       // coral color
+
+  // Clothing - dark coat, 3 layers
+  static const clothBase = Color(0xFF555565);   // dark gray-blue base
+  static const clothLight = Color(0xFF707080);  // light highlight
+  static const clothDark = Color(0xFF404050);   // dark shadow
+
+  // Ribbon decoration
+  static const ribbon = Color(0xFF333340);      // dark ribbon
+
+  // Gold accents
+  static const goldAccent = Color(0xFFE5C565);  // gold
+  static const goldLight = Color(0xFFF5E5A5);   // light gold
+
+  // Cat ears
+  static const earInner = Color(0xFFFFD5D5);    // ear inner pink
+  static const earFur = Color(0xFFF0C8C8);      // ear inner fur
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.scale(size.width / 32, size.height / 32);
+    canvas.scale(size.width / 64, size.height / 64);
 
     switch (state) {
       case CatState.idle:
@@ -141,7 +167,6 @@ class CatGirlPainter extends CustomPainter {
     }
   }
 
-  // ignore: unused_element
   void _drawPixel(Canvas canvas, double x, double y, Color color) {
     final paint = Paint()..color = color;
     canvas.drawRect(Rect.fromLTWH(x, y, 1, 1), paint);
@@ -152,182 +177,373 @@ class CatGirlPainter extends CustomPainter {
     canvas.drawRect(Rect.fromLTWH(x, y, w, h), paint);
   }
 
-  /// Helper: draw larger prominent cat ears (Pepe style - tall and upright)
-  void _drawEars(Canvas canvas, double offX, double offY) {
-    // Left ear - tall triangle shape (4px tall instead of 3)
-    _drawPixelRect(canvas, 9 + offX, 2 + offY, 1, 1, hairColor);
-    _drawPixelRect(canvas, 10 + offX, 2 + offY, 3, 1, hairColor);
-    _drawPixelRect(canvas, 9 + offX, 3 + offY, 4, 1, hairColor);
-    _drawPixelRect(canvas, 9 + offX, 4 + offY, 4, 1, hairColor);
-    _drawPixelRect(canvas, 10 + offX, 5 + offY, 2, 1, hairColor);
+  // ============================================================
+  // Helper: Draw cat ears (hoodie style, large and prominent)
+  // ============================================================
+  void _drawEars(Canvas canvas, double offX, double offY, {bool rightDroopy = false}) {
+    // Left ear - tall triangle, 5 rows high
+    _drawPixelRect(canvas, 18 + offX, 6 + offY, 1, 1, hairBase);
+    _drawPixelRect(canvas, 17 + offX, 6 + offY, 1, 1, hairLight);
+    _drawPixelRect(canvas, 17 + offX, 7 + offY, 4, 1, hairBase);
+    _drawPixelRect(canvas, 17 + offX, 8 + offY, 5, 1, hairBase);
+    _drawPixelRect(canvas, 18 + offX, 9 + offY, 3, 1, hairBase);
+    _drawPixelRect(canvas, 19 + offX, 10 + offY, 1, 1, hairBase);
     // Left ear inner
-    _drawPixelRect(canvas, 10 + offX, 3 + offY, 2, 1, earInnerColor);
-    _drawPixelRect(canvas, 10 + offX, 4 + offY, 2, 1, earInnerColor);
+    _drawPixelRect(canvas, 18 + offX, 7 + offY, 2, 1, earInner);
+    _drawPixelRect(canvas, 18 + offX, 8 + offY, 3, 1, earInner);
+    _drawPixelRect(canvas, 19 + offX, 8 + offY, 1, 1, earFur);
+    _drawPixelRect(canvas, 18 + offX, 9 + offY, 2, 1, earFur);
 
-    // Right ear - tall triangle shape
-    _drawPixelRect(canvas, 18 + offX, 2 + offY, 3, 1, hairColor);
-    _drawPixelRect(canvas, 18 + offX, 2 + offY, 1, 1, hairColor);
-    _drawPixelRect(canvas, 19 + offX, 2 + offY, 3, 1, hairColor);
-    _drawPixelRect(canvas, 19 + offX, 3 + offY, 4, 1, hairColor);
-    _drawPixelRect(canvas, 19 + offX, 4 + offY, 4, 1, hairColor);
-    _drawPixelRect(canvas, 20 + offX, 5 + offY, 2, 1, hairColor);
-    // Right ear inner
-    _drawPixelRect(canvas, 20 + offX, 3 + offY, 2, 1, earInnerColor);
-    _drawPixelRect(canvas, 20 + offX, 4 + offY, 2, 1, earInnerColor);
-  }
-
-  /// Helper: draw golden Egyptian headpiece / uraeus-style ornament
-  void _drawGoldHeadpiece(Canvas canvas, double offX, double offY) {
-    // Golden band across forehead
-    _drawPixelRect(canvas, 11 + offX, 7 + offY, 10, 1, goldAccent);
-    // Center jewel
-    _drawPixelRect(canvas, 15 + offX, 6 + offY, 2, 1, goldAccent);
-    _drawPixelRect(canvas, 15 + offX, 7 + offY, 2, 1, eyeColor); // sapphire gem
-    // Side ornaments
-    _drawPixelRect(canvas, 10 + offX, 7 + offY, 1, 2, goldAccent);
-    _drawPixelRect(canvas, 21 + offX, 7 + offY, 1, 2, goldAccent);
-    // Small dangling gold pieces
-    _drawPixelRect(canvas, 10 + offX, 9 + offY, 1, 1, goldAccent);
-    _drawPixelRect(canvas, 21 + offX, 9 + offY, 1, 1, goldAccent);
-  }
-
-  /// Helper: draw standard Pepe-style hair (golden, flowing)
-  void _drawHair(Canvas canvas, double offX, double offY) {
-    // Top hair volume
-    _drawPixelRect(canvas, 10 + offX, 5 + offY, 12, 3, hairColor);
-    // Hair shading (darker layer)
-    _drawPixelRect(canvas, 10 + offX, 7 + offY, 12, 1, hairDark);
-    // Side hair left
-    _drawPixelRect(canvas, 10 + offX, 8 + offY, 1, 7, hairColor);
-    _drawPixelRect(canvas, 9 + offX, 10 + offY, 1, 4, hairColor);
-    // Side hair right
-    _drawPixelRect(canvas, 21 + offX, 8 + offY, 1, 7, hairColor);
-    _drawPixelRect(canvas, 22 + offX, 10 + offY, 1, 4, hairColor);
-    // Back hair strands
-    _drawPixelRect(canvas, 11 + offX, 4 + offY, 10, 2, hairColor);
-  }
-
-  /// Helper: draw standard Pepe-style face features
-  void _drawFace(Canvas canvas, double offX, double offY, {bool blink = false, bool starEyes = false, bool bigEyes = false, bool closedEyes = false}) {
-    if (blink) {
-      // Blinking eyes - horizontal lines
-      _drawPixelRect(canvas, 13 + offX, 11 + offY, 2, 1, eyeColor);
-      _drawPixelRect(canvas, 17 + offX, 11 + offY, 2, 1, eyeColor);
-    } else if (starEyes) {
-      // Star-shaped happy eyes
-      _drawPixelRect(canvas, 13 + offX, 10 + offY, 2, 2, goldAccent);
-      _drawPixelRect(canvas, 17 + offX, 10 + offY, 2, 2, goldAccent);
-    } else if (bigEyes) {
-      // Big round shocked eyes
-      _drawPixelRect(canvas, 12 + offX, 9 + offY, 3, 3, Colors.white);
-      _drawPixelRect(canvas, 13 + offX, 10 + offY, 1, 1, eyeColor);
-      _drawPixelRect(canvas, 17 + offX, 9 + offY, 3, 3, Colors.white);
-      _drawPixelRect(canvas, 18 + offX, 10 + offY, 1, 1, eyeColor);
-    } else if (closedEyes) {
-      // Peaceful closed eyes (sleeping)
-      _drawPixelRect(canvas, 13 + offX, 11 + offY, 2, 1, eyeColor);
-      _drawPixelRect(canvas, 17 + offX, 11 + offY, 2, 1, eyeColor);
+    // Right ear
+    if (rightDroopy) {
+      // Droopy right ear - tilted to the side
+      _drawPixelRect(canvas, 39 + offX, 10 + offY, 4, 1, hairBase);
+      _drawPixelRect(canvas, 40 + offX, 9 + offY, 3, 1, hairBase);
+      _drawPixelRect(canvas, 41 + offX, 8 + offY, 2, 1, hairBase);
+      _drawPixelRect(canvas, 40 + offX, 10 + offY, 2, 1, earInner);
+      _drawPixelRect(canvas, 41 + offX, 9 + offY, 1, 1, earFur);
     } else {
-      // Normal blue eyes with white highlight
-      _drawPixelRect(canvas, 13 + offX, 10 + offY, 2, 2, eyeColor);
-      _drawPixelRect(canvas, 13 + offX, 10 + offY, 1, 1, Colors.white);
-      _drawPixelRect(canvas, 17 + offX, 10 + offY, 2, 2, eyeColor);
-      _drawPixelRect(canvas, 17 + offX, 10 + offY, 1, 1, Colors.white);
+      // Normal right ear - tall triangle, 5 rows high
+      _drawPixelRect(canvas, 42 + offX, 6 + offY, 1, 1, hairLight);
+      _drawPixelRect(canvas, 43 + offX, 6 + offY, 1, 1, hairBase);
+      _drawPixelRect(canvas, 43 + offX, 7 + offY, 4, 1, hairBase);
+      _drawPixelRect(canvas, 42 + offX, 8 + offY, 5, 1, hairBase);
+      _drawPixelRect(canvas, 43 + offX, 9 + offY, 3, 1, hairBase);
+      _drawPixelRect(canvas, 44 + offX, 10 + offY, 1, 1, hairBase);
+      // Right ear inner
+      _drawPixelRect(canvas, 44 + offX, 7 + offY, 2, 1, earInner);
+      _drawPixelRect(canvas, 43 + offX, 8 + offY, 3, 1, earInner);
+      _drawPixelRect(canvas, 44 + offX, 8 + offY, 1, 1, earFur);
+      _drawPixelRect(canvas, 44 + offX, 9 + offY, 2, 1, earFur);
+    }
+  }
+
+  // ============================================================
+  // Helper: Draw hair (golden, layered, with bangs and side hair)
+  // ============================================================
+  void _drawHair(Canvas canvas, double offX, double offY) {
+    // Top hair volume - back layer (darkest)
+    _drawPixelRect(canvas, 18 + offX, 8 + offY, 28, 2, hairShadow);
+
+    // Top hair volume - main layer
+    _drawPixelRect(canvas, 17 + offX, 8 + offY, 30, 3, hairBase);
+    // Top highlight
+    _drawPixelRect(canvas, 22 + offX, 8 + offY, 8, 1, hairLight);
+    _drawPixelRect(canvas, 30 + offX, 9 + offY, 4, 1, hairLight);
+
+    // Bangs - layered strands
+    // Left bangs
+    _drawPixelRect(canvas, 17 + offX, 11 + offY, 4, 2, hairBase);
+    _drawPixelRect(canvas, 17 + offX, 11 + offY, 2, 1, hairLight);
+    _drawPixelRect(canvas, 21 + offX, 11 + offY, 3, 3, hairBase);
+    _drawPixelRect(canvas, 21 + offX, 11 + offY, 1, 1, hairLight);
+    _drawPixelRect(canvas, 24 + offX, 11 + offY, 3, 2, hairDark);
+    _drawPixelRect(canvas, 24 + offX, 11 + offY, 1, 1, hairBase);
+    // Center bangs
+    _drawPixelRect(canvas, 27 + offX, 11 + offY, 4, 2, hairBase);
+    _drawPixelRect(canvas, 28 + offX, 11 + offY, 2, 1, hairLight);
+    _drawPixelRect(canvas, 31 + offX, 11 + offY, 3, 3, hairBase);
+    _drawPixelRect(canvas, 31 + offX, 11 + offY, 1, 1, hairLight);
+    // Right bangs
+    _drawPixelRect(canvas, 34 + offX, 11 + offY, 4, 2, hairBase);
+    _drawPixelRect(canvas, 34 + offX, 11 + offY, 1, 1, hairLight);
+    _drawPixelRect(canvas, 38 + offX, 11 + offY, 3, 2, hairDark);
+    _drawPixelRect(canvas, 41 + offX, 11 + offY, 4, 2, hairBase);
+    _drawPixelRect(canvas, 43 + offX, 11 + offY, 2, 1, hairLight);
+
+    // Side hair - left (long flowing)
+    _drawPixelRect(canvas, 16 + offX, 12 + offY, 2, 12, hairBase);
+    _drawPixelRect(canvas, 16 + offX, 12 + offY, 1, 4, hairLight);
+    _drawPixelRect(canvas, 15 + offX, 16 + offY, 1, 8, hairBase);
+    _drawPixelRect(canvas, 15 + offX, 16 + offY, 1, 3, hairDark);
+    _drawPixelRect(canvas, 16 + offX, 20 + offY, 1, 4, hairDark);
+    _drawPixelRect(canvas, 15 + offX, 22 + offY, 1, 2, hairShadow);
+
+    // Side hair - right (long flowing)
+    _drawPixelRect(canvas, 46 + offX, 12 + offY, 2, 12, hairBase);
+    _drawPixelRect(canvas, 47 + offX, 12 + offY, 1, 4, hairLight);
+    _drawPixelRect(canvas, 48 + offX, 16 + offY, 1, 8, hairBase);
+    _drawPixelRect(canvas, 48 + offX, 16 + offY, 1, 3, hairDark);
+    _drawPixelRect(canvas, 47 + offX, 20 + offY, 1, 4, hairDark);
+    _drawPixelRect(canvas, 48 + offX, 22 + offY, 1, 2, hairShadow);
+  }
+
+  // ============================================================
+  // Helper: Draw face with detailed eyes, blush, nose, mouth
+  // ============================================================
+  void _drawFace(
+    Canvas canvas,
+    double offX,
+    double offY, {
+    bool blink = false,
+    bool starEyes = false,
+    bool bigEyes = false,
+    bool closedEyes = false,
+    bool xxEyes = false,
+    bool openMouth = false,
+    bool wavyMouth = false,
+    bool bigSmile = false,
+  }) {
+    // Face base
+    _drawPixelRect(canvas, 20 + offX, 13 + offY, 24, 14, skinBase);
+    // Face highlight (forehead and cheeks)
+    _drawPixelRect(canvas, 22 + offX, 13 + offY, 10, 2, skinLight);
+    _drawPixelRect(canvas, 24 + offX, 14 + offY, 6, 1, skinLight);
+    // Face shadow (sides and chin)
+    _drawPixelRect(canvas, 20 + offX, 13 + offY, 2, 10, skinShadow);
+    _drawPixelRect(canvas, 42 + offX, 13 + offY, 2, 10, skinShadow);
+    _drawPixelRect(canvas, 22 + offX, 25 + offY, 20, 2, skinShadow);
+    _drawPixelRect(canvas, 24 + offX, 26 + offY, 16, 1, skinDark);
+
+    // Eyes
+    if (xxEyes) {
+      // X_X dizzy eyes
+      _drawPixelRect(canvas, 24 + offX, 17 + offY, 1, 1, eyeIris);
+      _drawPixelRect(canvas, 26 + offX, 17 + offY, 1, 1, eyeIris);
+      _drawPixelRect(canvas, 25 + offX, 18 + offY, 1, 1, eyeIris);
+      _drawPixelRect(canvas, 23 + offX, 18 + offY, 1, 1, eyeIris);
+      _drawPixelRect(canvas, 36 + offX, 17 + offY, 1, 1, eyeIris);
+      _drawPixelRect(canvas, 38 + offX, 17 + offY, 1, 1, eyeIris);
+      _drawPixelRect(canvas, 37 + offX, 18 + offY, 1, 1, eyeIris);
+      _drawPixelRect(canvas, 35 + offX, 18 + offY, 1, 1, eyeIris);
+    } else if (blink) {
+      // Blinking - 1 pixel high line
+      _drawPixelRect(canvas, 23 + offX, 18 + offY, 5, 1, eyeIris);
+      _drawPixelRect(canvas, 35 + offX, 18 + offY, 5, 1, eyeIris);
+    } else if (starEyes) {
+      // Star-shaped happy eyes (cross pattern)
+      // Left star eye
+      _drawPixelRect(canvas, 24 + offX, 17 + offY, 3, 1, goldLight);
+      _drawPixelRect(canvas, 25 + offX, 16 + offY, 1, 1, goldLight);
+      _drawPixelRect(canvas, 25 + offX, 18 + offY, 1, 1, goldLight);
+      _drawPixelRect(canvas, 25 + offX, 17 + offY, 1, 1, goldAccent);
+      _drawPixelRect(canvas, 24 + offX, 16 + offY, 1, 1, goldAccent);
+      _drawPixelRect(canvas, 26 + offX, 16 + offY, 1, 1, goldAccent);
+      _drawPixelRect(canvas, 24 + offX, 18 + offY, 1, 1, goldAccent);
+      _drawPixelRect(canvas, 26 + offX, 18 + offY, 1, 1, goldAccent);
+      // Right star eye
+      _drawPixelRect(canvas, 36 + offX, 17 + offY, 3, 1, goldLight);
+      _drawPixelRect(canvas, 37 + offX, 16 + offY, 1, 1, goldLight);
+      _drawPixelRect(canvas, 37 + offX, 18 + offY, 1, 1, goldLight);
+      _drawPixelRect(canvas, 37 + offX, 17 + offY, 1, 1, goldAccent);
+      _drawPixelRect(canvas, 36 + offX, 16 + offY, 1, 1, goldAccent);
+      _drawPixelRect(canvas, 38 + offX, 16 + offY, 1, 1, goldAccent);
+      _drawPixelRect(canvas, 36 + offX, 18 + offY, 1, 1, goldAccent);
+      _drawPixelRect(canvas, 38 + offX, 18 + offY, 1, 1, goldAccent);
+    } else if (bigEyes) {
+      // Big round shocked eyes (6 wide, 5 tall)
+      // Left eye
+      _drawPixelRect(canvas, 22 + offX, 15 + offY, 7, 6, eyeWhite);
+      _drawPixelRect(canvas, 23 + offX, 16 + offY, 5, 4, eyeIris);
+      _drawPixelRect(canvas, 24 + offX, 17 + offY, 3, 2, eyeIrisDark);
+      _drawPixelRect(canvas, 25 + offX, 17 + offY, 1, 2, eyePupil);
+      _drawPixelRect(canvas, 23 + offX, 15 + offY, 2, 1, eyeHighlight);
+      _drawPixelRect(canvas, 24 + offX, 20 + offY, 4, 1, eyeLower);
+      // Right eye
+      _drawPixelRect(canvas, 34 + offX, 15 + offY, 7, 6, eyeWhite);
+      _drawPixelRect(canvas, 35 + offX, 16 + offY, 5, 4, eyeIris);
+      _drawPixelRect(canvas, 36 + offX, 17 + offY, 3, 2, eyeIrisDark);
+      _drawPixelRect(canvas, 37 + offX, 17 + offY, 1, 2, eyePupil);
+      _drawPixelRect(canvas, 35 + offX, 15 + offY, 2, 1, eyeHighlight);
+      _drawPixelRect(canvas, 36 + offX, 20 + offY, 4, 1, eyeLower);
+    } else if (closedEyes) {
+      // Peaceful closed eyes (curved arcs)
+      _drawPixelRect(canvas, 23 + offX, 18 + offY, 5, 1, eyeIris);
+      _drawPixelRect(canvas, 24 + offX, 17 + offY, 3, 1, eyeIris);
+      _drawPixelRect(canvas, 35 + offX, 18 + offY, 5, 1, eyeIris);
+      _drawPixelRect(canvas, 36 + offX, 17 + offY, 3, 1, eyeIris);
+    } else {
+      // Normal big round purple eyes (5 wide, 4 tall)
+      // Left eye
+      _drawPixelRect(canvas, 23 + offX, 16 + offY, 5, 4, eyeWhite);
+      _drawPixelRect(canvas, 24 + offX, 17 + offY, 3, 2, eyeIris);
+      _drawPixelRect(canvas, 25 + offX, 17 + offY, 1, 2, eyeIrisDark);
+      _drawPixelRect(canvas, 25 + offX, 18 + offY, 1, 1, eyePupil);
+      _drawPixelRect(canvas, 24 + offX, 16 + offY, 2, 1, eyeHighlight);
+      _drawPixelRect(canvas, 24 + offX, 19 + offY, 3, 1, eyeLower);
+      // Right eye
+      _drawPixelRect(canvas, 35 + offX, 16 + offY, 5, 4, eyeWhite);
+      _drawPixelRect(canvas, 36 + offX, 17 + offY, 3, 2, eyeIris);
+      _drawPixelRect(canvas, 37 + offX, 17 + offY, 1, 2, eyeIrisDark);
+      _drawPixelRect(canvas, 37 + offX, 18 + offY, 1, 1, eyePupil);
+      _drawPixelRect(canvas, 36 + offX, 16 + offY, 2, 1, eyeHighlight);
+      _drawPixelRect(canvas, 36 + offX, 19 + offY, 3, 1, eyeLower);
     }
 
-    // Warm blush
-    _drawPixelRect(canvas, 12 + offX, 12 + offY, 1, 1, blushColor);
-    _drawPixelRect(canvas, 19 + offX, 12 + offY, 1, 1, blushColor);
+    // Nose - 1 pixel
+    _drawPixel(canvas, 31 + offX, 21 + offY, skinShadow);
 
-    // Coral mouth
-    _drawPixelRect(canvas, 15 + offX, 13 + offY, 2, 1, mouthColor);
+    // Blush - elliptical 4x2
+    _drawPixelRect(canvas, 22 + offX, 20 + offY, 4, 2, blush);
+    _drawPixelRect(canvas, 37 + offX, 20 + offY, 4, 2, blush);
+
+    // Mouth
+    if (openMouth) {
+      // O-shaped open mouth
+      _drawPixelRect(canvas, 29 + offX, 23 + offY, 4, 3, mouth);
+      _drawPixelRect(canvas, 30 + offX, 22 + offY, 2, 1, mouth);
+      _drawPixelRect(canvas, 30 + offX, 25 + offY, 2, 1, mouth);
+      _drawPixelRect(canvas, 30 + offX, 23 + offY, 2, 2, skinDark);
+    } else if (wavyMouth) {
+      // Wavy confused mouth
+      _drawPixelRect(canvas, 28 + offX, 23 + offY, 2, 1, mouth);
+      _drawPixelRect(canvas, 31 + offX, 23 + offY, 2, 1, mouth);
+      _drawPixelRect(canvas, 34 + offX, 23 + offY, 2, 1, mouth);
+    } else if (bigSmile) {
+      // Big arc smile
+      _drawPixelRect(canvas, 27 + offX, 23 + offY, 8, 1, mouth);
+      _drawPixelRect(canvas, 26 + offX, 22 + offY, 1, 1, mouth);
+      _drawPixelRect(canvas, 35 + offX, 22 + offY, 1, 1, mouth);
+      _drawPixelRect(canvas, 28 + offX, 24 + offY, 6, 1, mouth);
+      _drawPixelRect(canvas, 29 + offX, 24 + offY, 4, 1, skinDark);
+    } else {
+      // Omega-shaped smile (3 pixels wide)
+      _drawPixelRect(canvas, 29 + offX, 23 + offY, 4, 1, mouth);
+      _drawPixelRect(canvas, 28 + offX, 22 + offY, 1, 1, mouth);
+      _drawPixelRect(canvas, 33 + offX, 22 + offY, 1, 1, mouth);
+      _drawPixelRect(canvas, 30 + offX, 24 + offY, 2, 1, mouth);
+    }
   }
 
-  /// Helper: draw standard body with dress
+  // ============================================================
+  // Helper: Draw body with dark coat, ribbon, gold embroidery
+  // ============================================================
   void _drawBody(Canvas canvas, double offX, double offY) {
-    // Dress body
-    _drawPixelRect(canvas, 11 + offX, 16 + offY, 10, 8, dressColor);
-    // Dress collar / neckline
-    _drawPixelRect(canvas, 12 + offX, 15 + offY, 8, 1, dressAccent);
-    // Gold collar detail
-    _drawPixelRect(canvas, 14 + offX, 15 + offY, 4, 1, goldAccent);
+    // Coat body - main
+    _drawPixelRect(canvas, 20 + offX, 28 + offY, 24, 16, clothBase);
+    // Coat highlight (center chest)
+    _drawPixelRect(canvas, 26 + offX, 28 + offY, 8, 3, clothLight);
+    _drawPixelRect(canvas, 28 + offX, 31 + offY, 4, 2, clothLight);
+    // Coat shadow (sides)
+    _drawPixelRect(canvas, 20 + offX, 28 + offY, 3, 14, clothDark);
+    _drawPixelRect(canvas, 41 + offX, 28 + offY, 3, 14, clothDark);
+    // Coat bottom shadow
+    _drawPixelRect(canvas, 22 + offX, 42 + offY, 20, 2, clothDark);
+
+    // Collar / neckline
+    _drawPixelRect(canvas, 24 + offX, 27 + offY, 16, 2, clothLight);
+    _drawPixelRect(canvas, 26 + offX, 27 + offY, 12, 1, skinBase);
+
+    // Ribbon at collar (3-4 pixels)
+    _drawPixelRect(canvas, 30 + offX, 27 + offY, 4, 3, ribbon);
+    _drawPixelRect(canvas, 29 + offX, 28 + offY, 1, 1, ribbon);
+    _drawPixelRect(canvas, 34 + offX, 28 + offY, 1, 1, ribbon);
+    _drawPixelRect(canvas, 31 + offX, 29 + offY, 2, 1, goldAccent);
+    // Ribbon tails
+    _drawPixelRect(canvas, 30 + offX, 30 + offY, 1, 2, ribbon);
+    _drawPixelRect(canvas, 33 + offX, 30 + offY, 1, 2, ribbon);
+
+    // Gold embroidery lines
+    _drawPixelRect(canvas, 23 + offX, 30 + offY, 1, 6, goldAccent);
+    _drawPixelRect(canvas, 40 + offX, 30 + offY, 1, 6, goldAccent);
+    _drawPixelRect(canvas, 25 + offX, 35 + offY, 14, 1, goldAccent);
+
     // Arms
-    _drawPixelRect(canvas, 10 + offX, 17 + offY, 1, 4, skinColor);
-    _drawPixelRect(canvas, 21 + offX, 17 + offY, 1, 4, skinColor);
+    _drawPixelRect(canvas, 17 + offX, 30 + offY, 3, 10, clothBase);
+    _drawPixelRect(canvas, 17 + offX, 30 + offY, 1, 4, clothLight);
+    _drawPixelRect(canvas, 44 + offX, 30 + offY, 3, 10, clothBase);
+    _drawPixelRect(canvas, 46 + offX, 30 + offY, 1, 4, clothLight);
+    // Hands (skin)
+    _drawPixelRect(canvas, 17 + offX, 40 + offY, 3, 2, skinBase);
+    _drawPixelRect(canvas, 44 + offX, 40 + offY, 3, 2, skinBase);
+
     // Gold armbands
-    _drawPixelRect(canvas, 10 + offX, 17 + offY, 1, 1, goldAccent);
-    _drawPixelRect(canvas, 21 + offX, 17 + offY, 1, 1, goldAccent);
+    _drawPixelRect(canvas, 17 + offX, 30 + offY, 3, 1, goldAccent);
+    _drawPixelRect(canvas, 44 + offX, 30 + offY, 3, 1, goldAccent);
+  }
+
+  // ============================================================
+  // Helper: Draw legs and shoes
+  // ============================================================
+  void _drawLegs(Canvas canvas, double offX, double offY) {
     // Legs
-    _drawPixelRect(canvas, 12 + offX, 24 + offY, 2, 3, skinColor);
-    _drawPixelRect(canvas, 18 + offX, 24 + offY, 2, 3, skinColor);
-    // Sandals
-    _drawPixelRect(canvas, 11 + offX, 27 + offY, 3, 1, sandalColor);
-    _drawPixelRect(canvas, 18 + offX, 27 + offY, 3, 1, sandalColor);
-    // Gold sandal straps
-    _drawPixelRect(canvas, 12 + offX, 26 + offY, 2, 1, goldAccent);
-    _drawPixelRect(canvas, 19 + offX, 26 + offY, 2, 1, goldAccent);
+    _drawPixelRect(canvas, 24 + offX, 44 + offY, 4, 6, skinBase);
+    _drawPixelRect(canvas, 36 + offX, 44 + offY, 4, 6, skinBase);
+    // Leg shadow
+    _drawPixelRect(canvas, 24 + offX, 48 + offY, 4, 2, skinShadow);
+    _drawPixelRect(canvas, 36 + offX, 48 + offY, 4, 2, skinShadow);
+    // Shoes
+    _drawPixelRect(canvas, 23 + offX, 50 + offY, 6, 2, clothDark);
+    _drawPixelRect(canvas, 35 + offX, 50 + offY, 6, 2, clothDark);
+    // Shoe highlight
+    _drawPixelRect(canvas, 24 + offX, 50 + offY, 4, 1, clothBase);
+    _drawPixelRect(canvas, 36 + offX, 50 + offY, 4, 1, clothBase);
+    // Gold buckles
+    _drawPixelRect(canvas, 25 + offX, 50 + offY, 2, 1, goldAccent);
+    _drawPixelRect(canvas, 37 + offX, 50 + offY, 2, 1, goldAccent);
   }
 
-  /// Helper: draw golden tail
+  // ============================================================
+  // Helper: Draw tail
+  // ============================================================
   void _drawTail(Canvas canvas, double offX, double offY, {double wagX = 0}) {
-    _drawPixelRect(canvas, 2 + offX + wagX, 18 + offY, 2, 1, tailColor);
-    _drawPixelRect(canvas, 1 + offX + wagX, 17 + offY, 2, 1, tailColor);
-    _drawPixelRect(canvas, 1 + offX + wagX, 16 + offY, 1, 1, tailColor);
-    // Tail tip highlight
-    _drawPixelRect(canvas, 1 + offX + wagX, 16 + offY, 1, 1, goldAccent);
+    _drawPixelRect(canvas, 6 + offX + wagX, 34 + offY, 3, 1, hairBase);
+    _drawPixelRect(canvas, 5 + offX + wagX, 33 + offY, 2, 1, hairBase);
+    _drawPixelRect(canvas, 4 + offX + wagX, 32 + offY, 2, 1, hairBase);
+    _drawPixelRect(canvas, 4 + offX + wagX, 31 + offY, 2, 1, hairLight);
+    // Tail tip
+    _drawPixelRect(canvas, 3 + offX + wagX, 30 + offY, 2, 1, hairLight);
   }
 
-  // === IDLE: Standing with breathing animation, gold headpiece ===
+  // ============================================================
+  // IDLE: Standing with breathing animation
+  // ============================================================
   void _drawIdle(Canvas canvas) {
-    final breathOffset = frame == 1 ? -0.5 : (frame == 3 ? 0.5 : 0.0);
+    // Breathing: frame 0,2 body down 0.5; frame 1,3 body up 0.5
+    final breathOffset = (frame == 1 || frame == 3) ? -0.5 : 0.5;
     final blink = frame == 2;
 
     // Tail
     _drawTail(canvas, 0, breathOffset);
 
+    // Legs
+    _drawLegs(canvas, 0, breathOffset);
+
     // Body
     _drawBody(canvas, 0, breathOffset);
 
-    // Head
-    _drawPixelRect(canvas, 11, 8 + breathOffset, 10, 8, skinColor);
+    // Head / Face
+    _drawFace(canvas, 0, breathOffset, blink: blink);
 
     // Hair
     _drawHair(canvas, 0, breathOffset);
 
-    // Large prominent cat ears
+    // Cat ears
     _drawEars(canvas, 0, breathOffset);
-
-    // Golden Egyptian headpiece
-    _drawGoldHeadpiece(canvas, 0, breathOffset);
-
-    // Face
-    _drawFace(canvas, 0, breathOffset, blink: blink);
   }
 
-  // === HAPPY: Arms up, bouncing, golden sparkles ===
+  // ============================================================
+  // HAPPY: Star eyes, big smile, bouncing
+  // ============================================================
   void _drawHappy(Canvas canvas) {
-    final bounce = [0.0, -1.5, 0.0, -1.0][frame];
+    final bounce = [0.0, -2.0, 0.0, -1.0][frame];
 
     // Tail (wagging)
-    final tailWag = [0.0, 1.0, 0.0, -1.0][frame];
+    final tailWag = [0.0, 1.5, 0.0, -1.5][frame];
     _drawTail(canvas, 0, bounce, wagX: tailWag);
 
+    // Legs
+    _drawLegs(canvas, 0, bounce);
+
     // Body
-    _drawPixelRect(canvas, 11, 16 + bounce, 10, 8, dressColor);
-    _drawPixelRect(canvas, 12, 15 + bounce, 8, 1, dressAccent);
-    _drawPixelRect(canvas, 14, 15 + bounce, 4, 1, goldAccent);
+    _drawBody(canvas, 0, bounce);
 
-    // Arms UP
-    _drawPixelRect(canvas, 10, 12 + bounce, 1, 4, skinColor);
-    _drawPixelRect(canvas, 9, 11 + bounce, 2, 1, skinColor);
-    _drawPixelRect(canvas, 21, 12 + bounce, 1, 4, skinColor);
-    _drawPixelRect(canvas, 21, 11 + bounce, 2, 1, skinColor);
+    // Arms UP (happy pose)
+    _drawPixelRect(canvas, 17, 20 + bounce, 3, 8, clothBase);
+    _drawPixelRect(canvas, 17, 20 + bounce, 1, 3, clothLight);
+    _drawPixelRect(canvas, 15, 18 + bounce, 3, 2, clothBase);
+    _drawPixelRect(canvas, 44, 20 + bounce, 3, 8, clothBase);
+    _drawPixelRect(canvas, 46, 20 + bounce, 1, 3, clothLight);
+    _drawPixelRect(canvas, 46, 18 + bounce, 3, 2, clothBase);
+    // Hands
+    _drawPixelRect(canvas, 15, 17 + bounce, 3, 2, skinBase);
+    _drawPixelRect(canvas, 46, 17 + bounce, 3, 2, skinBase);
     // Gold armbands
-    _drawPixelRect(canvas, 10, 12 + bounce, 1, 1, goldAccent);
-    _drawPixelRect(canvas, 21, 12 + bounce, 1, 1, goldAccent);
+    _drawPixelRect(canvas, 17, 20 + bounce, 3, 1, goldAccent);
+    _drawPixelRect(canvas, 44, 20 + bounce, 3, 1, goldAccent);
 
-    // Head
-    _drawPixelRect(canvas, 11, 8 + bounce, 10, 8, skinColor);
+    // Head / Face with star eyes and big smile
+    _drawFace(canvas, 0, bounce, starEyes: true, bigSmile: true);
 
     // Hair
     _drawHair(canvas, 0, bounce);
@@ -335,374 +551,311 @@ class CatGirlPainter extends CustomPainter {
     // Cat ears
     _drawEars(canvas, 0, bounce);
 
-    // Golden headpiece
-    _drawGoldHeadpiece(canvas, 0, bounce);
-
-    // Star eyes (golden, happy)
-    _drawPixelRect(canvas, 13, 10 + bounce, 2, 2, goldAccent);
-    _drawPixelRect(canvas, 17, 10 + bounce, 2, 2, goldAccent);
-
-    // Big smile
-    _drawPixelRect(canvas, 14, 13 + bounce, 4, 1, mouthColor);
-    _drawPixelRect(canvas, 13, 13 + bounce, 1, 1, mouthColor);
-    _drawPixelRect(canvas, 18, 13 + bounce, 1, 1, mouthColor);
-
-    // Blush
-    _drawPixelRect(canvas, 12, 12 + bounce, 1, 1, blushColor);
-    _drawPixelRect(canvas, 19, 12 + bounce, 1, 1, blushColor);
-
-    // Legs
-    _drawPixelRect(canvas, 12, 24 + bounce, 2, 3, skinColor);
-    _drawPixelRect(canvas, 18, 24 + bounce, 2, 3, skinColor);
-    _drawPixelRect(canvas, 11, 27 + bounce, 3, 1, sandalColor);
-    _drawPixelRect(canvas, 18, 27 + bounce, 3, 1, sandalColor);
-    _drawPixelRect(canvas, 12, 26 + bounce, 2, 1, goldAccent);
-    _drawPixelRect(canvas, 19, 26 + bounce, 2, 1, goldAccent);
+    // Sparkles
+    if (frame % 2 == 0) {
+      _drawPixelRect(canvas, 12, 10 + bounce, 1, 1, goldLight);
+      _drawPixelRect(canvas, 50, 12 + bounce, 1, 1, goldLight);
+      _drawPixelRect(canvas, 8, 20 + bounce, 1, 1, goldAccent);
+    }
   }
 
-  // === CONFUSED: Tilted head, question mark ===
+  // ============================================================
+  // CONFUSED: One ear droopy, wavy mouth, head tilt
+  // ============================================================
   void _drawConfused(Canvas canvas) {
-    // ignore: unused_local_variable
     final tilt = frame == 1 ? 1.0 : 0.0;
 
     // Tail (droopy)
-    _drawPixelRect(canvas, 2, 19, 2, 1, tailColor);
-    _drawPixelRect(canvas, 1, 20, 2, 1, tailColor);
-
-    // Body
-    _drawPixelRect(canvas, 11, 16, 10, 8, dressColor);
-    _drawPixelRect(canvas, 12, 15, 8, 1, dressAccent);
-    _drawPixelRect(canvas, 14, 15, 4, 1, goldAccent);
-
-    // Arms (one scratching head)
-    _drawPixelRect(canvas, 10, 17, 1, 4, skinColor);
-    _drawPixelRect(canvas, 21, 14, 1, 3, skinColor);
-    _drawPixelRect(canvas, 10, 17, 1, 1, goldAccent);
-
-    // Head
-    _drawPixelRect(canvas, 11, 8, 10, 8, skinColor);
-
-    // Hair
-    _drawHair(canvas, 0, 0);
-
-    // Cat ears (one droopy - right ear tilted)
-    // Left ear normal
-    _drawPixelRect(canvas, 9, 2, 1, 1, hairColor);
-    _drawPixelRect(canvas, 10, 2, 3, 1, hairColor);
-    _drawPixelRect(canvas, 9, 3, 4, 1, hairColor);
-    _drawPixelRect(canvas, 9, 4, 4, 1, hairColor);
-    _drawPixelRect(canvas, 10, 5, 2, 1, hairColor);
-    _drawPixelRect(canvas, 10, 3, 2, 1, earInnerColor);
-    _drawPixelRect(canvas, 10, 4, 2, 1, earInnerColor);
-    // Right ear droopy
-    _drawPixelRect(canvas, 19, 5, 4, 1, hairColor);
-    _drawPixelRect(canvas, 20, 4, 3, 1, hairColor);
-    _drawPixelRect(canvas, 21, 3, 2, 1, hairColor);
-    _drawPixelRect(canvas, 20, 5, 2, 1, earInnerColor);
-
-    // Golden headpiece
-    _drawGoldHeadpiece(canvas, 0, 0);
-
-    // Eyes (one normal, one squinting)
-    _drawPixelRect(canvas, 13, 10, 2, 2, eyeColor);
-    _drawPixelRect(canvas, 13, 10, 1, 1, Colors.white);
-    _drawPixelRect(canvas, 17, 11, 2, 1, eyeColor); // squinting
-
-    // Wavy mouth
-    _drawPixelRect(canvas, 14, 13, 1, 1, mouthColor);
-    _drawPixelRect(canvas, 16, 13, 1, 1, mouthColor);
-
-    // Blush
-    _drawPixelRect(canvas, 12, 12, 1, 1, blushColor);
-    _drawPixelRect(canvas, 19, 12, 1, 1, blushColor);
-
-    // Question mark above head (gold colored)
-    _drawPixelRect(canvas, 23, 3, 1, 1, goldAccent);
-    _drawPixelRect(canvas, 23, 4, 1, 1, goldAccent);
-    _drawPixelRect(canvas, 24, 4, 1, 1, goldAccent);
-    _drawPixelRect(canvas, 24, 5, 1, 1, goldAccent);
-    _drawPixelRect(canvas, 23, 6, 1, 1, goldAccent);
+    _drawPixelRect(canvas, 6, 36, 3, 1, hairBase);
+    _drawPixelRect(canvas, 5, 37, 2, 1, hairDark);
 
     // Legs
-    _drawPixelRect(canvas, 12, 24, 2, 3, skinColor);
-    _drawPixelRect(canvas, 18, 24, 2, 3, skinColor);
-    _drawPixelRect(canvas, 11, 27, 3, 1, sandalColor);
-    _drawPixelRect(canvas, 18, 27, 3, 1, sandalColor);
-    _drawPixelRect(canvas, 12, 26, 2, 1, goldAccent);
-    _drawPixelRect(canvas, 19, 26, 2, 1, goldAccent);
-  }
-
-  // === PUSHED AWAY: Sliding left, hands pushing ===
-  void _drawPushedAway(Canvas canvas) {
-    // ignore: unused_local_variable
-    final slideX = frame * 2.0;
+    _drawLegs(canvas, 0, 0);
 
     // Body
-    _drawPixelRect(canvas, 11, 16, 10, 8, dressColor);
-    _drawPixelRect(canvas, 12, 15, 8, 1, dressAccent);
-    _drawPixelRect(canvas, 14, 15, 4, 1, goldAccent);
+    _drawBody(canvas, 0, 0);
 
-    // Arms pushing forward (to the right)
-    _drawPixelRect(canvas, 21, 16, 3, 1, skinColor);
-    _drawPixelRect(canvas, 24, 15, 1, 3, skinColor);
-    _drawPixelRect(canvas, 10, 17, 1, 4, skinColor);
-    _drawPixelRect(canvas, 21, 16, 1, 1, goldAccent);
+    // Arms - one scratching head
+    _drawPixelRect(canvas, 17, 30, 3, 10, clothBase);
+    _drawPixelRect(canvas, 44, 18, 3, 8, clothBase);
+    _drawPixelRect(canvas, 44, 18, 1, 3, clothLight);
+    _drawPixelRect(canvas, 44, 26, 3, 2, skinBase);
+    _drawPixelRect(canvas, 17, 30, 3, 1, goldAccent);
+    _drawPixelRect(canvas, 44, 18, 3, 1, goldAccent);
 
-    // Head
-    _drawPixelRect(canvas, 11, 8, 10, 8, skinColor);
+    // Head / Face with wavy mouth
+    _drawFace(canvas, tilt, 0, wavyMouth: true);
 
     // Hair
-    _drawHair(canvas, 0, 0);
+    _drawHair(canvas, tilt, 0);
 
-    // Cat ears (alert, pushed back slightly)
-    _drawPixelRect(canvas, 9, 2, 1, 1, hairColor);
-    _drawPixelRect(canvas, 10, 2, 3, 1, hairColor);
-    _drawPixelRect(canvas, 9, 3, 4, 1, hairColor);
-    _drawPixelRect(canvas, 9, 4, 4, 1, hairColor);
-    _drawPixelRect(canvas, 10, 5, 2, 1, hairColor);
-    _drawPixelRect(canvas, 10, 3, 2, 1, earInnerColor);
-    _drawPixelRect(canvas, 10, 4, 2, 1, earInnerColor);
+    // Cat ears - right ear droopy
+    _drawEars(canvas, tilt, 0, rightDroopy: true);
 
-    _drawPixelRect(canvas, 19, 2, 3, 1, hairColor);
-    _drawPixelRect(canvas, 19, 3, 4, 1, hairColor);
-    _drawPixelRect(canvas, 19, 4, 4, 1, hairColor);
-    _drawPixelRect(canvas, 20, 5, 2, 1, hairColor);
-    _drawPixelRect(canvas, 20, 3, 2, 1, earInnerColor);
-    _drawPixelRect(canvas, 20, 4, 2, 1, earInnerColor);
+    // Question mark
+    _drawPixelRect(canvas, 48, 6, 1, 1, goldAccent);
+    _drawPixelRect(canvas, 49, 6, 1, 1, goldAccent);
+    _drawPixelRect(canvas, 49, 7, 1, 1, goldAccent);
+    _drawPixelRect(canvas, 49, 8, 1, 1, goldAccent);
+    _drawPixelRect(canvas, 48, 9, 1, 1, goldAccent);
+    _drawPixelRect(canvas, 48, 10, 1, 1, goldAccent);
+  }
 
-    // Golden headpiece
-    _drawGoldHeadpiece(canvas, 0, 0);
+  // ============================================================
+  // PUSHED AWAY: Body leaning back, arms pushing forward, sweat
+  // ============================================================
+  void _drawPushedAway(Canvas canvas) {
+    final slideX = frame * 1.5;
 
-    // Eyes (struggling)
-    _drawPixelRect(canvas, 13, 10, 2, 2, eyeColor);
-    _drawPixelRect(canvas, 13, 10, 1, 1, Colors.white);
-    _drawPixelRect(canvas, 17, 10, 2, 2, eyeColor);
-    _drawPixelRect(canvas, 17, 10, 1, 1, Colors.white);
+    // Tail
+    _drawTail(canvas, -slideX, 0);
+
+    // Legs (running pose - spread)
+    _drawPixelRect(canvas, 22 - slideX, 44, 4, 6, skinBase);
+    _drawPixelRect(canvas, 38 - slideX, 44, 4, 6, skinBase);
+    _drawPixelRect(canvas, 22 - slideX, 48, 4, 2, skinShadow);
+    _drawPixelRect(canvas, 38 - slideX, 48, 4, 2, skinShadow);
+    _drawPixelRect(canvas, 21 - slideX, 50, 6, 2, clothDark);
+    _drawPixelRect(canvas, 37 - slideX, 50, 6, 2, clothDark);
+
+    // Body (leaning back)
+    _drawBody(canvas, -slideX, 0);
+
+    // Arms pushing forward
+    _drawPixelRect(canvas, 44 - slideX, 28, 6, 2, skinBase);
+    _drawPixelRect(canvas, 49 - slideX, 27, 2, 4, skinBase);
+    _drawPixelRect(canvas, 17 - slideX, 30, 3, 10, clothBase);
+    _drawPixelRect(canvas, 17 - slideX, 40, 3, 2, skinBase);
+
+    // Head / Face
+    _drawFace(canvas, -slideX, 0, openMouth: true);
+
+    // Hair
+    _drawHair(canvas, -slideX, 0);
+
+    // Cat ears (alert)
+    _drawEars(canvas, -slideX, 0);
+
     // Sweat drop
-    _drawPixelRect(canvas, 22, 9, 1, 1, Color(0xFF66CCFF));
-
-    // Open mouth
-    _drawPixelRect(canvas, 14, 13, 4, 1, mouthColor);
-
-    // Blush
-    _drawPixelRect(canvas, 12, 12, 1, 1, blushColor);
-    _drawPixelRect(canvas, 19, 12, 1, 1, blushColor);
+    _drawPixelRect(canvas, 46 - slideX, 14, 2, 3, Color(0xFF66CCFF));
+    _drawPixelRect(canvas, 46 - slideX, 13, 1, 1, Color(0xFF88DDFF));
 
     // Motion lines
     for (int i = 0; i < 3; i++) {
-      _drawPixelRect(canvas, 25 + i * 2, 10 + i * 3, 1, 2, Color(0xFFFFFFFF).withValues(alpha: 0.5));
+      _drawPixelRect(canvas, 52 + i * 2, 20 + i * 4, 1, 3, Color(0xFFFFFFFF).withValues(alpha: 0.5));
     }
-
-    // Legs (running pose)
-    _drawPixelRect(canvas, 12, 24, 2, 3, skinColor);
-    _drawPixelRect(canvas, 18, 24, 2, 3, skinColor);
-    _drawPixelRect(canvas, 11, 27, 3, 1, sandalColor);
-    _drawPixelRect(canvas, 18, 27, 3, 1, sandalColor);
-    _drawPixelRect(canvas, 12, 26, 2, 1, goldAccent);
-    _drawPixelRect(canvas, 19, 26, 2, 1, goldAccent);
   }
 
-  // === SLEEPING: Lying down, eyes closed ===
+  // ============================================================
+  // SLEEPING: Eyes closed, body lying down, Zzz
+  // ============================================================
   void _drawSleeping(Canvas canvas) {
-    final breathe = frame == 0 ? 0.0 : 0.3;
+    final breathe = frame == 0 ? 0.0 : 0.5;
 
     // Tail curled
-    _drawPixelRect(canvas, 2, 20, 3, 1, tailColor);
-    _drawPixelRect(canvas, 1, 19, 2, 1, tailColor);
-    _drawPixelRect(canvas, 1, 18, 1, 1, goldAccent);
+    _drawPixelRect(canvas, 4, 36, 4, 1, hairBase);
+    _drawPixelRect(canvas, 3, 35, 2, 1, hairBase);
+    _drawPixelRect(canvas, 3, 34, 2, 1, hairLight);
 
     // Body (lying down, wider)
-    _drawPixelRect(canvas, 6, 20 + breathe, 16, 4, dressColor);
-    _drawPixelRect(canvas, 8, 19 + breathe, 12, 1, dressAccent);
-    // Gold belt detail
-    _drawPixelRect(canvas, 10, 20 + breathe, 8, 1, goldAccent);
+    _drawPixelRect(canvas, 10, 36 + breathe, 32, 6, clothBase);
+    _drawPixelRect(canvas, 12, 35 + breathe, 28, 2, clothLight);
+    _drawPixelRect(canvas, 14, 36 + breathe, 24, 1, goldAccent);
+    // Body shadow
+    _drawPixelRect(canvas, 10, 40 + breathe, 32, 2, clothDark);
 
     // Head (resting on side)
-    _drawPixelRect(canvas, 4, 18 + breathe, 6, 5, skinColor);
+    _drawPixelRect(canvas, 6, 30 + breathe, 12, 8, skinBase);
+    _drawPixelRect(canvas, 8, 30 + breathe, 6, 2, skinLight);
+    _drawPixelRect(canvas, 6, 36 + breathe, 12, 2, skinShadow);
 
-    // Hair (flowing)
-    _drawPixelRect(canvas, 3, 16 + breathe, 8, 3, hairColor);
-    _drawPixelRect(canvas, 4, 18 + breathe, 1, 4, hairColor);
-    _drawPixelRect(canvas, 3, 17 + breathe, 1, 1, earInnerColor); // ear
-    // Hair shading
-    _drawPixelRect(canvas, 3, 18 + breathe, 1, 1, hairDark);
+    // Hair (flowing while lying down)
+    _drawPixelRect(canvas, 4, 28 + breathe, 16, 4, hairBase);
+    _drawPixelRect(canvas, 6, 28 + breathe, 8, 1, hairLight);
+    _drawPixelRect(canvas, 4, 32 + breathe, 2, 6, hairBase);
+    _drawPixelRect(canvas, 4, 32 + breathe, 1, 3, hairLight);
+    _drawPixelRect(canvas, 4, 36 + breathe, 2, 2, hairDark);
 
-    // Closed eyes (peaceful lines)
-    _drawPixelRect(canvas, 5, 20 + breathe, 2, 1, eyeColor);
-    _drawPixelRect(canvas, 8, 20 + breathe, 2, 1, eyeColor);
+    // Cat ear (one visible)
+    _drawPixelRect(canvas, 6, 26 + breathe, 3, 2, hairBase);
+    _drawPixelRect(canvas, 7, 26 + breathe, 1, 1, earInner);
+
+    // Closed eyes (peaceful arcs)
+    _drawPixelRect(canvas, 9, 33 + breathe, 4, 1, eyeIris);
+    _drawPixelRect(canvas, 10, 32 + breathe, 2, 1, eyeIris);
 
     // Peaceful mouth
-    _drawPixelRect(canvas, 6, 21 + breathe, 2, 1, mouthColor);
+    _drawPixelRect(canvas, 10, 35 + breathe, 3, 1, mouth);
 
     // Blush
-    _drawPixelRect(canvas, 5, 21 + breathe, 1, 1, blushColor);
-    _drawPixelRect(canvas, 9, 21 + breathe, 1, 1, blushColor);
+    _drawPixelRect(canvas, 8, 34 + breathe, 3, 1, blush);
+    _drawPixelRect(canvas, 14, 34 + breathe, 3, 1, blush);
 
     // Feet
-    _drawPixelRect(canvas, 20, 21 + breathe, 2, 2, skinColor);
-    _drawPixelRect(canvas, 22, 22 + breathe, 2, 1, sandalColor);
+    _drawPixelRect(canvas, 40, 37 + breathe, 4, 3, skinBase);
+    _drawPixelRect(canvas, 40, 39 + breathe, 4, 1, skinShadow);
 
-    // Zzz (gold colored)
-    _drawPixelRect(canvas, 10, 15 + breathe, 1, 1, goldAccent);
-    _drawPixelRect(canvas, 11, 14 + breathe, 1, 1, goldAccent);
-    _drawPixelRect(canvas, 12, 13 + breathe, 1, 1, goldAccent);
+    // Zzz (floating)
+    _drawPixelRect(canvas, 20, 26 + breathe, 2, 2, goldLight);
+    _drawPixelRect(canvas, 23, 23 + breathe, 2, 2, goldLight);
+    _drawPixelRect(canvas, 26, 20 + breathe, 3, 2, goldLight);
   }
 
-  // === SQUISHED: Flat/wide ===
+  // ============================================================
+  // SQUISHED: Body horizontally compressed, X_X eyes
+  // ============================================================
   void _drawSquished(Canvas canvas) {
-    // ignore: unused_local_variable
-    final squish = [0.0, 0.5, 1.0][frame];
-
-    // Body (wider, shorter)
-    _drawPixelRect(canvas, 6, 20, 20, 4, dressColor);
+    // Body (wider +4, shorter -2)
+    _drawPixelRect(canvas, 14, 36, 36, 10, clothBase);
+    _drawPixelRect(canvas, 18, 36, 28, 3, clothLight);
+    _drawPixelRect(canvas, 14, 36, 4, 8, clothDark);
+    _drawPixelRect(canvas, 46, 36, 4, 8, clothDark);
+    _drawPixelRect(canvas, 16, 44, 32, 2, clothDark);
     // Gold belt
-    _drawPixelRect(canvas, 8, 20, 16, 1, goldAccent);
+    _drawPixelRect(canvas, 18, 38, 28, 1, goldAccent);
 
     // Arms (spread out)
-    _drawPixelRect(canvas, 4, 21, 2, 1, skinColor);
-    _drawPixelRect(canvas, 26, 21, 2, 1, skinColor);
+    _drawPixelRect(canvas, 8, 38, 6, 2, clothBase);
+    _drawPixelRect(canvas, 8, 38, 2, 2, skinBase);
+    _drawPixelRect(canvas, 50, 38, 6, 2, clothBase);
+    _drawPixelRect(canvas, 54, 38, 2, 2, skinBase);
 
     // Head (wider)
-    _drawPixelRect(canvas, 8, 14, 16, 6, skinColor);
+    _drawPixelRect(canvas, 16, 24, 32, 12, skinBase);
+    _drawPixelRect(canvas, 20, 24, 16, 3, skinLight);
+    _drawPixelRect(canvas, 16, 24, 4, 8, skinShadow);
+    _drawPixelRect(canvas, 44, 24, 4, 8, skinShadow);
+    _drawPixelRect(canvas, 20, 34, 24, 2, skinShadow);
 
     // Hair (spread out)
-    _drawPixelRect(canvas, 7, 12, 18, 3, hairColor);
-    _drawPixelRect(canvas, 7, 14, 1, 5, hairColor);
-    _drawPixelRect(canvas, 24, 14, 1, 5, hairColor);
-    // Hair shading
-    _drawPixelRect(canvas, 7, 14, 18, 1, hairDark);
+    _drawPixelRect(canvas, 14, 20, 36, 6, hairBase);
+    _drawPixelRect(canvas, 18, 20, 12, 2, hairLight);
+    _drawPixelRect(canvas, 14, 24, 2, 8, hairBase);
+    _drawPixelRect(canvas, 48, 24, 2, 8, hairBase);
+    _drawPixelRect(canvas, 14, 24, 36, 1, hairDark);
 
-    // Cat ears (flattened but still prominent)
-    _drawPixelRect(canvas, 6, 10, 5, 2, hairColor);
-    _drawPixelRect(canvas, 7, 10, 3, 1, earInnerColor);
-    _drawPixelRect(canvas, 21, 10, 5, 2, hairColor);
-    _drawPixelRect(canvas, 22, 10, 3, 1, earInnerColor);
+    // Cat ears (flattened)
+    _drawPixelRect(canvas, 12, 18, 6, 3, hairBase);
+    _drawPixelRect(canvas, 14, 18, 3, 2, earInner);
+    _drawPixelRect(canvas, 46, 18, 6, 3, hairBase);
+    _drawPixelRect(canvas, 48, 18, 3, 2, earInner);
 
-    // Eyes (X_X dizzy)
-    _drawPixelRect(canvas, 11, 16, 1, 1, eyeColor);
-    _drawPixelRect(canvas, 13, 16, 1, 1, eyeColor);
-    _drawPixelRect(canvas, 12, 17, 1, 1, eyeColor);
-    _drawPixelRect(canvas, 10, 17, 1, 1, eyeColor);
-
-    _drawPixelRect(canvas, 19, 16, 1, 1, eyeColor);
-    _drawPixelRect(canvas, 21, 16, 1, 1, eyeColor);
-    _drawPixelRect(canvas, 20, 17, 1, 1, eyeColor);
-    _drawPixelRect(canvas, 18, 17, 1, 1, eyeColor);
+    // X_X eyes
+    _drawPixelRect(canvas, 22, 28, 1, 1, eyeIris);
+    _drawPixelRect(canvas, 24, 28, 1, 1, eyeIris);
+    _drawPixelRect(canvas, 23, 29, 1, 1, eyeIris);
+    _drawPixelRect(canvas, 21, 29, 1, 1, eyeIris);
+    _drawPixelRect(canvas, 40, 28, 1, 1, eyeIris);
+    _drawPixelRect(canvas, 42, 28, 1, 1, eyeIris);
+    _drawPixelRect(canvas, 41, 29, 1, 1, eyeIris);
+    _drawPixelRect(canvas, 39, 29, 1, 1, eyeIris);
 
     // Wavy mouth
-    _drawPixelRect(canvas, 14, 18, 4, 1, mouthColor);
+    _drawPixelRect(canvas, 28, 32, 3, 1, mouth);
+    _drawPixelRect(canvas, 33, 32, 3, 1, mouth);
 
     // Blush
-    _drawPixelRect(canvas, 10, 18, 1, 1, blushColor);
-    _drawPixelRect(canvas, 21, 18, 1, 1, blushColor);
+    _drawPixelRect(canvas, 20, 31, 4, 2, blush);
+    _drawPixelRect(canvas, 40, 31, 4, 2, blush);
 
     // Legs (spread)
-    _drawPixelRect(canvas, 8, 24, 2, 2, skinColor);
-    _drawPixelRect(canvas, 22, 24, 2, 2, skinColor);
+    _drawPixelRect(canvas, 18, 46, 4, 3, skinBase);
+    _drawPixelRect(canvas, 42, 46, 4, 3, skinBase);
   }
 
-  // === SHOCKED: Big eyes, sweat drops ===
+  // ============================================================
+  // SHOCKED: Bigger eyes, O mouth, body shaking
+  // ============================================================
   void _drawShocked(Canvas canvas) {
     final shake = [0.0, -0.5, 0.5, 0.0][frame];
 
+    // Tail
+    _drawTail(canvas, shake, 0);
+
+    // Legs
+    _drawLegs(canvas, shake, 0);
+
     // Body
-    _drawPixelRect(canvas, 11 + shake, 16, 10, 8, dressColor);
-    _drawPixelRect(canvas, 12 + shake, 15, 8, 1, dressAccent);
-    _drawPixelRect(canvas, 14 + shake, 15, 4, 1, goldAccent);
+    _drawBody(canvas, shake, 0);
 
     // Arms (up in shock)
-    _drawPixelRect(canvas, 9 + shake, 14, 2, 1, skinColor);
-    _drawPixelRect(canvas, 10 + shake, 15, 1, 3, skinColor);
-    _drawPixelRect(canvas, 22 + shake, 14, 2, 1, skinColor);
-    _drawPixelRect(canvas, 21 + shake, 15, 1, 3, skinColor);
-    // Gold armbands
-    _drawPixelRect(canvas, 9 + shake, 14, 1, 1, goldAccent);
-    _drawPixelRect(canvas, 22 + shake, 14, 1, 1, goldAccent);
+    _drawPixelRect(canvas, 14 + shake, 22, 3, 6, clothBase);
+    _drawPixelRect(canvas, 13 + shake, 20, 2, 2, clothBase);
+    _drawPixelRect(canvas, 13 + shake, 19, 2, 2, skinBase);
+    _drawPixelRect(canvas, 47 + shake, 22, 3, 6, clothBase);
+    _drawPixelRect(canvas, 49 + shake, 20, 2, 2, clothBase);
+    _drawPixelRect(canvas, 49 + shake, 19, 2, 2, skinBase);
+    _drawPixelRect(canvas, 14 + shake, 22, 3, 1, goldAccent);
+    _drawPixelRect(canvas, 47 + shake, 22, 3, 1, goldAccent);
 
-    // Head
-    _drawPixelRect(canvas, 11 + shake, 8, 10, 8, skinColor);
+    // Head / Face with big eyes and O mouth
+    _drawFace(canvas, shake, 0, bigEyes: true, openMouth: true);
 
     // Hair
     _drawHair(canvas, shake, 0);
 
-    // Cat ears (straight up, alert - extra tall)
-    _drawPixelRect(canvas, 9 + shake, 1, 1, 1, hairColor);
-    _drawPixelRect(canvas, 10 + shake, 1, 3, 1, hairColor);
-    _drawPixelRect(canvas, 9 + shake, 2, 4, 1, hairColor);
-    _drawPixelRect(canvas, 9 + shake, 3, 4, 1, hairColor);
-    _drawPixelRect(canvas, 10 + shake, 4, 2, 1, hairColor);
-    _drawPixelRect(canvas, 10 + shake, 2, 2, 1, earInnerColor);
-    _drawPixelRect(canvas, 10 + shake, 3, 2, 1, earInnerColor);
-
-    _drawPixelRect(canvas, 18 + shake, 1, 3, 1, hairColor);
-    _drawPixelRect(canvas, 19 + shake, 2, 4, 1, hairColor);
-    _drawPixelRect(canvas, 19 + shake, 3, 4, 1, hairColor);
-    _drawPixelRect(canvas, 20 + shake, 4, 2, 1, hairColor);
-    _drawPixelRect(canvas, 20 + shake, 2, 2, 1, earInnerColor);
-    _drawPixelRect(canvas, 20 + shake, 3, 2, 1, earInnerColor);
-
-    // Golden headpiece
-    _drawGoldHeadpiece(canvas, shake, 0);
-
-    // Big round eyes
-    _drawPixelRect(canvas, 12 + shake, 9, 3, 3, Colors.white);
-    _drawPixelRect(canvas, 13 + shake, 10, 1, 1, eyeColor);
-    _drawPixelRect(canvas, 17 + shake, 9, 3, 3, Colors.white);
-    _drawPixelRect(canvas, 18 + shake, 10, 1, 1, eyeColor);
-
-    // O mouth
-    _drawPixelRect(canvas, 15 + shake, 13, 2, 2, mouthColor);
-
-    // Blush
-    _drawPixelRect(canvas, 12 + shake, 12, 1, 1, blushColor);
-    _drawPixelRect(canvas, 19 + shake, 12, 1, 1, blushColor);
+    // Cat ears (straight up, alert)
+    _drawEars(canvas, shake, 0);
 
     // Sweat drops
-    _drawPixelRect(canvas, 22 + shake, 8, 1, 2, Color(0xFF66CCFF));
-    _drawPixelRect(canvas, 9 + shake, 14, 1, 1, Color(0xFF66CCFF));
+    _drawPixelRect(canvas, 46 + shake, 12, 2, 3, Color(0xFF66CCFF));
+    _drawPixelRect(canvas, 46 + shake, 11, 1, 1, Color(0xFF88DDFF));
+    _drawPixelRect(canvas, 20 + shake, 12, 1, 2, Color(0xFF66CCFF));
 
-    // Legs
-    _drawPixelRect(canvas, 12 + shake, 24, 2, 3, skinColor);
-    _drawPixelRect(canvas, 18 + shake, 24, 2, 3, skinColor);
-    _drawPixelRect(canvas, 11 + shake, 27, 3, 1, sandalColor);
-    _drawPixelRect(canvas, 18 + shake, 27, 3, 1, sandalColor);
-    _drawPixelRect(canvas, 12 + shake, 26, 2, 1, goldAccent);
-    _drawPixelRect(canvas, 19 + shake, 26, 2, 1, goldAccent);
-
-    // Exclamation marks (gold)
-    _drawPixelRect(canvas, 24, 4, 1, 2, goldAccent);
-    _drawPixelRect(canvas, 24, 7, 1, 1, goldAccent);
+    // Exclamation marks
+    _drawPixelRect(canvas, 50, 6, 1, 3, goldAccent);
+    _drawPixelRect(canvas, 50, 10, 1, 1, goldAccent);
   }
 
-  // === CELEBRATING: Jumping, spinning ===
+  // ============================================================
+  // CELEBRATING: Hands up, star eyes, jumping
+  // ============================================================
   void _drawCelebrating(Canvas canvas) {
-    final jumpHeight = [0.0, -2.0, -3.0, -2.0, 0.0, -1.5][frame];
+    final jumpHeight = [0.0, -3.0, -4.0, -3.0, 0.0, -2.0][frame];
     final spin = frame < 3;
 
+    // Tail (wagging)
+    final tailWag = [0.0, 2.0, 0.0, -2.0, 0.0, 1.0][frame];
+    _drawTail(canvas, 0, jumpHeight, wagX: tailWag);
+
+    // Legs (slightly apart when jumping)
+    _drawPixelRect(canvas, 22, 44 + jumpHeight, 4, 6, skinBase);
+    _drawPixelRect(canvas, 38, 44 + jumpHeight, 4, 6, skinBase);
+    _drawPixelRect(canvas, 22, 48 + jumpHeight, 4, 2, skinShadow);
+    _drawPixelRect(canvas, 38, 48 + jumpHeight, 4, 2, skinShadow);
+    _drawPixelRect(canvas, 21, 50 + jumpHeight, 6, 2, clothDark);
+    _drawPixelRect(canvas, 35, 50 + jumpHeight, 6, 2, clothDark);
+    _drawPixelRect(canvas, 22, 50 + jumpHeight, 4, 1, clothBase);
+    _drawPixelRect(canvas, 36, 50 + jumpHeight, 4, 1, clothBase);
+
     // Body
-    _drawPixelRect(canvas, 11, 16 + jumpHeight, 10, 8, dressColor);
-    _drawPixelRect(canvas, 12, 15 + jumpHeight, 8, 1, dressAccent);
-    _drawPixelRect(canvas, 14, 15 + jumpHeight, 4, 1, goldAccent);
+    _drawBody(canvas, 0, jumpHeight);
 
     // Arms (alternating up)
     if (spin) {
-      _drawPixelRect(canvas, 9, 10 + jumpHeight, 2, 1, skinColor);
-      _drawPixelRect(canvas, 10, 11 + jumpHeight, 1, 5, skinColor);
-      _drawPixelRect(canvas, 9, 10 + jumpHeight, 1, 1, goldAccent);
-      _drawPixelRect(canvas, 21, 13 + jumpHeight, 2, 1, skinColor);
-      _drawPixelRect(canvas, 21, 14 + jumpHeight, 1, 3, skinColor);
-      _drawPixelRect(canvas, 21, 13 + jumpHeight, 1, 1, goldAccent);
+      // Left arm up, right arm out
+      _drawPixelRect(canvas, 14, 18 + jumpHeight, 3, 10, clothBase);
+      _drawPixelRect(canvas, 14, 18 + jumpHeight, 1, 3, clothLight);
+      _drawPixelRect(canvas, 12, 16 + jumpHeight, 3, 3, clothBase);
+      _drawPixelRect(canvas, 12, 15 + jumpHeight, 3, 2, skinBase);
+      _drawPixelRect(canvas, 14, 18 + jumpHeight, 3, 1, goldAccent);
+      _drawPixelRect(canvas, 47, 30 + jumpHeight, 3, 8, clothBase);
+      _drawPixelRect(canvas, 47, 38 + jumpHeight, 3, 2, skinBase);
+      _drawPixelRect(canvas, 47, 30 + jumpHeight, 3, 1, goldAccent);
     } else {
-      _drawPixelRect(canvas, 21, 10 + jumpHeight, 2, 1, skinColor);
-      _drawPixelRect(canvas, 21, 11 + jumpHeight, 1, 5, skinColor);
-      _drawPixelRect(canvas, 21, 10 + jumpHeight, 1, 1, goldAccent);
-      _drawPixelRect(canvas, 9, 13 + jumpHeight, 2, 1, skinColor);
-      _drawPixelRect(canvas, 10, 14 + jumpHeight, 1, 3, skinColor);
-      _drawPixelRect(canvas, 9, 13 + jumpHeight, 1, 1, goldAccent);
+      // Right arm up, left arm out
+      _drawPixelRect(canvas, 47, 18 + jumpHeight, 3, 10, clothBase);
+      _drawPixelRect(canvas, 49, 18 + jumpHeight, 1, 3, clothLight);
+      _drawPixelRect(canvas, 49, 16 + jumpHeight, 3, 3, clothBase);
+      _drawPixelRect(canvas, 49, 15 + jumpHeight, 3, 2, skinBase);
+      _drawPixelRect(canvas, 47, 18 + jumpHeight, 3, 1, goldAccent);
+      _drawPixelRect(canvas, 14, 30 + jumpHeight, 3, 8, clothBase);
+      _drawPixelRect(canvas, 14, 38 + jumpHeight, 3, 2, skinBase);
+      _drawPixelRect(canvas, 14, 30 + jumpHeight, 3, 1, goldAccent);
     }
 
-    // Head
-    _drawPixelRect(canvas, 11, 8 + jumpHeight, 10, 8, skinColor);
+    // Head / Face with star eyes and big smile
+    _drawFace(canvas, 0, jumpHeight, starEyes: true, bigSmile: true);
 
     // Hair
     _drawHair(canvas, 0, jumpHeight);
@@ -710,34 +863,15 @@ class CatGirlPainter extends CustomPainter {
     // Cat ears
     _drawEars(canvas, 0, jumpHeight);
 
-    // Golden headpiece
-    _drawGoldHeadpiece(canvas, 0, jumpHeight);
-
-    // Happy eyes (closed, smiling - blue arcs)
-    _drawPixelRect(canvas, 13, 10 + jumpHeight, 2, 1, eyeColor);
-    _drawPixelRect(canvas, 17, 10 + jumpHeight, 2, 1, eyeColor);
-
-    // Big grin
-    _drawPixelRect(canvas, 13, 13 + jumpHeight, 6, 1, mouthColor);
-    _drawPixelRect(canvas, 14, 12 + jumpHeight, 4, 1, mouthColor);
-
-    // Blush
-    _drawPixelRect(canvas, 12, 12 + jumpHeight, 1, 1, blushColor);
-    _drawPixelRect(canvas, 19, 12 + jumpHeight, 1, 1, blushColor);
-
-    // Legs
-    _drawPixelRect(canvas, 12, 24 + jumpHeight, 2, 3, skinColor);
-    _drawPixelRect(canvas, 18, 24 + jumpHeight, 2, 3, skinColor);
-    _drawPixelRect(canvas, 11, 27 + jumpHeight, 3, 1, sandalColor);
-    _drawPixelRect(canvas, 18, 27 + jumpHeight, 3, 1, sandalColor);
-    _drawPixelRect(canvas, 12, 26 + jumpHeight, 2, 1, goldAccent);
-    _drawPixelRect(canvas, 19, 26 + jumpHeight, 2, 1, goldAccent);
-
-    // Golden sparkles
+    // Sparkles around
     if (frame % 2 == 0) {
-      _drawPixelRect(canvas, 5, 5 + jumpHeight, 1, 1, goldAccent);
-      _drawPixelRect(canvas, 26, 8 + jumpHeight, 1, 1, goldAccent);
-      _drawPixelRect(canvas, 3, 14 + jumpHeight, 1, 1, goldAccent);
+      _drawPixelRect(canvas, 8, 8 + jumpHeight, 2, 2, goldLight);
+      _drawPixelRect(canvas, 54, 10 + jumpHeight, 2, 2, goldLight);
+      _drawPixelRect(canvas, 6, 22 + jumpHeight, 1, 1, goldAccent);
+      _drawPixelRect(canvas, 56, 18 + jumpHeight, 1, 1, goldAccent);
+    } else {
+      _drawPixelRect(canvas, 10, 14 + jumpHeight, 1, 1, goldLight);
+      _drawPixelRect(canvas, 52, 6 + jumpHeight, 1, 1, goldLight);
     }
   }
 
