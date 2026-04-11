@@ -164,10 +164,10 @@ class CatGirlPainter extends CustomPainter {
     final rect = path.getBounds();
     final paint = Paint()
       ..shader = LinearGradient(
-        begin: from ?? Offset(rect.left, rect.top),
-        end: to ?? Offset(rect.right, rect.bottom),
+        begin: from != null ? Alignment(from.dx, from.dy) : Alignment.topLeft,
+        end: to != null ? Alignment(to.dx, to.dy) : Alignment.bottomRight,
         colors: colors,
-      )
+      ).createShader(rect)
       ..isAntiAlias = true
       ..style = PaintingStyle.fill;
     canvas.drawPath(path, paint);
@@ -176,16 +176,15 @@ class CatGirlPainter extends CustomPainter {
   /// Draw a radial-gradient ellipse (for eyes)
   void _drawRadialEllipse(Canvas canvas, Offset center, double rx, double ry,
       List<Color> colors) {
+    final rect = Rect.fromCenter(center: center, width: rx * 2, height: ry * 2);
     final paint = Paint()
       ..shader = RadialGradient(
-        center: center,
+        center: Alignment(center.dx, center.dy),
         radius: rx,
         colors: colors,
-      )
+      ).createShader(rect)
       ..isAntiAlias = true;
-    canvas.drawOval(
-        Rect.fromCenter(center: center, width: rx * 2, height: ry * 2),
-        paint);
+    canvas.drawOval(rect, paint);
   }
 
   /// Draw a stroked path
