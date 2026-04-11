@@ -18,16 +18,23 @@ class _CalcButtonState extends State<CalcButton> {
   Color _getBackgroundColor() {
     if (widget.label == '=') return AppColors.buttonSpecialBg;
     if ('÷×+-'.contains(widget.label)) return AppColors.buttonOpBg;
-    if (widget.label == 'C') return AppColors.buttonBg;
+    if (widget.label == 'C' || widget.label == 'CE') return AppColors.buttonBg;
     if (widget.label == '⌫') return AppColors.buttonOpBg;
+    // 科学运算键（1/x、x²、²√x）使用运算符样式
+    if (widget.label == '1/x' || widget.label == 'x²' || widget.label == '²√x') {
+      return AppColors.buttonOpBg;
+    }
     return AppColors.panel;
   }
 
   Color _getPressedBackgroundColor() {
     if (widget.label == '=') return const Color(0xFF006CBE);
     if ('÷×+-'.contains(widget.label)) return const Color(0xFFD8D8D8);
-    if (widget.label == 'C') return const Color(0xFFE0E0E0);
+    if (widget.label == 'C' || widget.label == 'CE') return const Color(0xFFE0E0E0);
     if (widget.label == '⌫') return const Color(0xFFD8D8D8);
+    if (widget.label == '1/x' || widget.label == 'x²' || widget.label == '²√x') {
+      return const Color(0xFFD8D8D8);
+    }
     return const Color(0xFFE8E8E8);
   }
 
@@ -38,8 +45,12 @@ class _CalcButtonState extends State<CalcButton> {
   TextStyle _getTextStyle() {
     if (widget.label == '=') return PixelTextStyles.buttonSpecial;
     if ('÷×+-'.contains(widget.label)) return PixelTextStyles.buttonOp;
-    if (widget.label == 'C') {
+    if (widget.label == 'C' || widget.label == 'CE') {
       return PixelTextStyles.button.copyWith(color: AppColors.red);
+    }
+    // 科学运算键（1/x、x²、²√x）使用稍小的文字
+    if (widget.label == '1/x' || widget.label == 'x²' || widget.label == '²√x') {
+      return PixelTextStyles.buttonOp.copyWith(fontSize: 14);
     }
     return PixelTextStyles.button;
   }

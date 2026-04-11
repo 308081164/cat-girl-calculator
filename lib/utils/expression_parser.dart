@@ -26,8 +26,12 @@ class ExpressionParser {
         return ParseResult(value: 'Error!', catState: CatState.shocked, hasError: true);
       }
 
+      // 处理负数：将表达式开头的负号或运算符后的负号转换为 (0-...) 形式
+      // 例如 "-5+3" -> "(0-5)+3"，"5+-3" -> "5+(0-3)"
+      String processed = _handleNegativeNumbers(expression);
+
       final parser = GrammarParser();
-      final exp = parser.parse(expression);
+      final exp = parser.parse(processed);
       final result = exp.evaluate(EvaluationType.REAL, _context);
 
       if (result.isInfinite || result.isNaN) {
@@ -49,6 +53,24 @@ class ExpressionParser {
     } catch (e) {
       return ParseResult(value: 'Error!', catState: CatState.confused, hasError: true);
     }
+  }
+
+  /// 处理表达式中的负数，将负号转换为 (0-...) 形式
+  /// 使 math_expressions 解析器能正确解析负数
+  String _handleNegativeNumbers(String expression) {
+    // 处理表达式开头的负号："-5" -> "(0-5)"
+    String result = expression.replaceFirstMapped(
+      RegExp(r'^(-)(\d+\.?\d*)'),
+      (m) => '(0${m[1]}${m[2]})',
+    );
+
+    // 处理运算符后的负号："5+-3" -> "5+(0-3)"，"5*-3" -> "5*(0-3)"
+    result = result.replaceAllMapped(
+      RegExp(r'([+\-*/])(-)(\d+\.?\d*)'),
+      (m) => '${m[1]}(0${m[2]}${m[3]})',
+    );
+
+    return result;
   }
 
   CatState _determineCatState(String formatted, double result) {

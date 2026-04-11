@@ -117,6 +117,108 @@ class CalculatorController extends ChangeNotifier {
     _updateDisplay();
   }
 
+  /// CE - 清除当前输入的数字，保留表达式
+  void clearEntry() {
+    _resetIdleTimer();
+    _currentInput = '';
+    _updateDisplay();
+  }
+
+  /// +/- - 切换当前数字的正负号
+  void toggleSign() {
+    _resetIdleTimer();
+    if (_currentInput.isEmpty) return;
+    if (_currentInput.startsWith('-')) {
+      _currentInput = _currentInput.substring(1);
+    } else {
+      _currentInput = '-$_currentInput';
+    }
+    _updateDisplay();
+  }
+
+  /// % - 百分比计算，将当前数字除以100
+  void percentage() {
+    _resetIdleTimer();
+    if (_currentInput.isEmpty) return;
+    final num value = num.parse(_currentInput);
+    final result = value / 100;
+    _currentInput = _formatNumber(result);
+    _updateDisplay();
+  }
+
+  /// 1/x - 倒数计算
+  void reciprocal() {
+    _resetIdleTimer();
+    if (_currentInput.isEmpty) return;
+    final num value = num.parse(_currentInput);
+    if (value == 0) {
+      _state = _state.copyWith(
+        resultText: 'Error!',
+        catState: CatState.shocked,
+        hasError: true,
+      );
+      notifyListeners();
+      return;
+    }
+    final result = 1 / value;
+    _currentInput = _formatNumber(result);
+    _updateDisplay();
+  }
+
+  /// x² - 平方计算
+  void square() {
+    _resetIdleTimer();
+    if (_currentInput.isEmpty) return;
+    final num value = num.parse(_currentInput);
+    final result = value * value;
+    _currentInput = _formatNumber(result);
+    _updateDisplay();
+  }
+
+  /// ²√x - 平方根计算
+  void squareRoot() {
+    _resetIdleTimer();
+    if (_currentInput.isEmpty) return;
+    final num value = num.parse(_currentInput);
+    if (value < 0) {
+      _state = _state.copyWith(
+        resultText: 'Error!',
+        catState: CatState.shocked,
+        hasError: true,
+      );
+      notifyListeners();
+      return;
+    }
+    final result = _sqrt(value.toDouble());
+    _currentInput = _formatNumber(result);
+    _updateDisplay();
+  }
+
+  /// 格式化数字，去除不必要的尾零
+  String _formatNumber(num value) {
+    if (value == value.roundToDouble()) {
+      return value.toInt().toString();
+    }
+    String formatted = value.toStringAsFixed(8)
+        .replaceAll(RegExp(r'0+$'), '')
+        .replaceAll(RegExp(r'\.$'), '');
+    return formatted;
+  }
+
+  /// 计算平方根（使用 dart:math）
+  double _sqrt(double value) {
+    // 使用简单的牛顿迭代法，避免引入 dart:math
+    if (value < 0) return double.nan;
+    if (value == 0) return 0;
+    double x = value;
+    double y = (x + 1) / 2;
+    while (y < x) {
+      x = y;
+      y = (x + value / x) / 2;
+    }
+    return x;
+  }
+
   void _updateDisplay() {
     final displayText = _currentInput.isEmpty ? '0' : _currentInput;
     _state = _state.copyWith(
