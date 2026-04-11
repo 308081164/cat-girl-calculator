@@ -23,6 +23,7 @@ flutter:
   assets:
     - assets/images/
     - assets/sprites/pixel_v2/
+    - assets/sprites/pixel_v3/
 
 flutter_launcher_icons:
   android: true

@@ -15,7 +15,7 @@ class _CatCharacterState extends State<CatCharacter> with SingleTickerProviderSt
 
   // 帧数配置
   static const _frameCounts = {
-    CatState.idle: 3,
+    CatState.idle: 4,
     CatState.happy: 3,
     CatState.confused: 2,
     CatState.pushedAway: 2,
@@ -27,52 +27,53 @@ class _CatCharacterState extends State<CatCharacter> with SingleTickerProviderSt
 
   // 帧间隔（毫秒）
   static const _frameDurations = {
-    CatState.idle: 600,
+    CatState.idle: 500,
     CatState.happy: 300,
-    CatState.confused: 500,
-    CatState.pushedAway: 250,
-    CatState.sleeping: 1000,
-    CatState.squished: 400,
-    CatState.shocked: 200,
+    CatState.confused: 600,
+    CatState.pushedAway: 300,
+    CatState.sleeping: 1200,
+    CatState.squished: 500,
+    CatState.shocked: 250,
     CatState.celebrating: 250,
   };
 
-  // 精灵图路径映射
+  // 精灵图路径映射 (v3 - 严格一致的帧间动画)
   static const _spritePaths = {
     CatState.idle: [
-      'assets/sprites/pixel_v2/idle_frame0.png',
-      'assets/sprites/pixel_v2/idle_frame1.png',
-      'assets/sprites/pixel_v2/idle_frame2.png',
+      'assets/sprites/pixel_v3/idle_frame0.png',
+      'assets/sprites/pixel_v3/idle_frame1.png',
+      'assets/sprites/pixel_v3/idle_frame2.png',
+      'assets/sprites/pixel_v3/idle_frame3.png',
     ],
     CatState.happy: [
-      'assets/sprites/pixel_v2/happy_frame0.png',
-      'assets/sprites/pixel_v2/happy_frame1.png',
-      'assets/sprites/pixel_v2/happy_frame2.png',
+      'assets/sprites/pixel_v3/happy_frame0.png',
+      'assets/sprites/pixel_v3/happy_frame1.png',
+      'assets/sprites/pixel_v3/happy_frame2.png',
     ],
     CatState.confused: [
-      'assets/sprites/pixel_v2/confused_frame0.png',
-      'assets/sprites/pixel_v2/confused_frame1.png',
+      'assets/sprites/pixel_v3/confused_frame0.png',
+      'assets/sprites/pixel_v3/confused_frame1.png',
     ],
     CatState.pushedAway: [
-      'assets/sprites/pixel_v2/pushedAway_frame0.png',
-      'assets/sprites/pixel_v2/pushedAway_frame1.png',
+      'assets/sprites/pixel_v3/pushedAway_frame0.png',
+      'assets/sprites/pixel_v3/pushedAway_frame1.png',
     ],
     CatState.sleeping: [
-      'assets/sprites/pixel_v2/sleeping_frame0.png',
-      'assets/sprites/pixel_v2/sleeping_frame1.png',
+      'assets/sprites/pixel_v3/sleeping_frame0.png',
+      'assets/sprites/pixel_v3/sleeping_frame1.png',
     ],
     CatState.squished: [
-      'assets/sprites/pixel_v2/squished_frame0.png',
-      'assets/sprites/pixel_v2/squished_frame1.png',
+      'assets/sprites/pixel_v3/squished_frame0.png',
+      'assets/sprites/pixel_v3/squished_frame1.png',
     ],
     CatState.shocked: [
-      'assets/sprites/pixel_v2/shocked_frame0.png',
-      'assets/sprites/pixel_v2/shocked_frame1.png',
+      'assets/sprites/pixel_v3/shocked_frame0.png',
+      'assets/sprites/pixel_v3/shocked_frame1.png',
     ],
     CatState.celebrating: [
-      'assets/sprites/pixel_v2/celebrating_frame0.png',
-      'assets/sprites/pixel_v2/celebrating_frame1.png',
-      'assets/sprites/pixel_v2/celebrating_frame2.png',
+      'assets/sprites/pixel_v3/celebrating_frame0.png',
+      'assets/sprites/pixel_v3/celebrating_frame1.png',
+      'assets/sprites/pixel_v3/celebrating_frame2.png',
     ],
   };
 
@@ -122,9 +123,8 @@ class _CatCharacterState extends State<CatCharacter> with SingleTickerProviderSt
       child: Image.asset(
         paths[_currentFrame],
         fit: BoxFit.contain,
-        filterQuality: FilterQuality.none, // 保持像素锐利
+        filterQuality: FilterQuality.none,
         errorBuilder: (context, error, stackTrace) {
-          // 加载失败时显示占位
           return Container(
             width: 160,
             height: 160,
