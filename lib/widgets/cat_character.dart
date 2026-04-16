@@ -27,14 +27,14 @@ class _CatCharacterState extends State<CatCharacter> with SingleTickerProviderSt
 
   // 帧间隔（毫秒）
   static const _frameDurations = {
-    CatState.idle: 500,
-    CatState.happy: 300,
-    CatState.confused: 600,
-    CatState.pushedAway: 300,
-    CatState.sleeping: 1200,
-    CatState.squished: 500,
-    CatState.shocked: 250,
-    CatState.celebrating: 250,
+    CatState.idle: 2000,
+    CatState.happy: 400,
+    CatState.confused: 800,
+    CatState.pushedAway: 400,
+    CatState.sleeping: 3000,
+    CatState.squished: 600,
+    CatState.shocked: 300,
+    CatState.celebrating: 300,
   };
 
   // 精灵图路径映射 (v3 - 严格一致的帧间动画)

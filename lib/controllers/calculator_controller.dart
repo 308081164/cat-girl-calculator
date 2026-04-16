@@ -26,6 +26,8 @@ class CalculatorController extends ChangeNotifier {
       _pendingExpression = '';
       _justCalculated = false;
     }
+    // 限制最大输入15位（double安全整数范围内）
+    if (_currentInput.replaceFirst('-', '').length >= 15) return;
     if (_currentInput == '0' && digit != '.') {
       _currentInput = digit;
     } else {

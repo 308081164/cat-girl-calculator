@@ -30,6 +30,24 @@ class ExpressionParser {
       // 例如 "-5+3" -> "(0-5)+3"，"5+-3" -> "5+(0-3)"
       String processed = _handleNegativeNumbers(expression);
 
+      // 大数精度保护：对于简单的 a+b 或 a-b，使用字符串运算
+      final simpleAddSub = RegExp(r'^\(?(\d+)\)?\s*([+\-])\s*\(?(0-)?(\d+)\)?$');
+      final match = simpleAddSub.firstMatch(processed);
+      if (match != null) {
+        final a = match[1]!;
+        final op = match[2]!;
+        final b = match[4]!;
+        if (a.length > 15 || b.length > 15) {
+          // 使用字符串大数运算
+          String bigResult = _bigNumberOp(a, op, b);
+          return ParseResult(
+            value: bigResult,
+            catState: _determineCatState(bigResult, double.tryParse(bigResult) ?? 0),
+            hasError: false,
+          );
+        }
+      }
+
       final parser = GrammarParser();
       final exp = parser.parse(processed);
       final result = exp.evaluate(EvaluationType.REAL, _context);
@@ -93,5 +111,55 @@ class ExpressionParser {
     }
 
     return CatState.happy;
+  }
+
+  /// 字符串大数加法
+  static String _bigNumberAdd(String a, String b) {
+    // 对齐位数
+    int maxLen = a.length > b.length ? a.length : b.length;
+    a = a.padLeft(maxLen, '0');
+    b = b.padLeft(maxLen, '0');
+
+    String result = '';
+    int carry = 0;
+    for (int i = maxLen - 1; i >= 0; i--) {
+      int sum = int.parse(a[i]) + int.parse(b[i]) + carry;
+      carry = sum ~/ 10;
+      result = (sum % 10).toString() + result;
+    }
+    if (carry > 0) result = carry.toString() + result;
+    return result;
+  }
+
+  /// 字符串大数减法（假设 a >= b）
+  static String _bigNumberSub(String a, String b) {
+    a = a.padLeft(a.length, '0');
+    b = b.padLeft(a.length, '0');
+
+    String result = '';
+    int borrow = 0;
+    for (int i = a.length - 1; i >= 0; i--) {
+      int diff = int.parse(a[i]) - int.parse(b[i]) - borrow;
+      if (diff < 0) {
+        diff += 10;
+        borrow = 1;
+      } else {
+        borrow = 0;
+      }
+      result = diff.toString() + result;
+    }
+    // 去除前导零
+    result = result.replaceFirst(RegExp(r'^0+'), '');
+    return result.isEmpty ? '0' : result;
+  }
+
+  static String _bigNumberOp(String a, String op, String b) {
+    if (op == '+') return _bigNumberAdd(a, b);
+    // 判断哪个大
+    if (a.length > b.length || (a.length == b.length && a.compareTo(b) >= 0)) {
+      return _bigNumberSub(a, b);
+    } else {
+      return '-' + _bigNumberSub(b, a);
+    }
   }
 }
