@@ -1,7 +1,7 @@
 name: cat_girl_calculator
 description: A retro pixel art cat girl calculator
 publish_to: 'none'
-version: 1.0.15+33
+version: 1.0.16+35
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
