@@ -17,14 +17,14 @@ class _CatCharacterState extends State<CatCharacter> with SingleTickerProviderSt
 
   // 每帧间隔（毫秒）- 20帧 × 100ms = 2秒完整循环
   static const _frameDurations = {
-    CatState.idle: 100,
-    CatState.happy: 80,
-    CatState.confused: 120,
-    CatState.pushedAway: 80,
-    CatState.sleeping: 150,
-    CatState.squished: 100,
-    CatState.shocked: 60,
-    CatState.celebrating: 80,
+    CatState.idle: 200,
+    CatState.happy: 160,
+    CatState.confused: 240,
+    CatState.pushedAway: 160,
+    CatState.sleeping: 300,
+    CatState.squished: 200,
+    CatState.shocked: 120,
+    CatState.celebrating: 160,
   };
 
   static const _basePath = 'assets/sprites/pixel_v4';
