@@ -13,83 +13,38 @@ class _CatCharacterState extends State<CatCharacter> with SingleTickerProviderSt
   late AnimationController _frameController;
   int _currentFrame = 0;
 
-  // 帧数配置
-  static const _frameCounts = {
-    CatState.idle: 4,
-    CatState.happy: 3,
-    CatState.confused: 2,
-    CatState.pushedAway: 2,
-    CatState.sleeping: 2,
-    CatState.squished: 2,
-    CatState.shocked: 2,
-    CatState.celebrating: 3,
-  };
+  static const _totalFrames = 20;
 
-  // 帧间隔（毫秒）
+  // 每帧间隔（毫秒）- 20帧 × 100ms = 2秒完整循环
   static const _frameDurations = {
-    CatState.idle: 2000,
-    CatState.happy: 400,
-    CatState.confused: 800,
-    CatState.pushedAway: 400,
-    CatState.sleeping: 3000,
-    CatState.squished: 600,
-    CatState.shocked: 300,
-    CatState.celebrating: 300,
+    CatState.idle: 100,
+    CatState.happy: 80,
+    CatState.confused: 120,
+    CatState.pushedAway: 80,
+    CatState.sleeping: 150,
+    CatState.squished: 100,
+    CatState.shocked: 60,
+    CatState.celebrating: 80,
   };
 
-  // 精灵图路径映射 (v3 - 严格一致的帧间动画)
-  static const _spritePaths = {
-    CatState.idle: [
-      'assets/sprites/pixel_v3/idle_frame0.png',
-      'assets/sprites/pixel_v3/idle_frame1.png',
-      'assets/sprites/pixel_v3/idle_frame2.png',
-      'assets/sprites/pixel_v3/idle_frame3.png',
-    ],
-    CatState.happy: [
-      'assets/sprites/pixel_v3/happy_frame0.png',
-      'assets/sprites/pixel_v3/happy_frame1.png',
-      'assets/sprites/pixel_v3/happy_frame2.png',
-    ],
-    CatState.confused: [
-      'assets/sprites/pixel_v3/confused_frame0.png',
-      'assets/sprites/pixel_v3/confused_frame1.png',
-    ],
-    CatState.pushedAway: [
-      'assets/sprites/pixel_v3/pushedAway_frame0.png',
-      'assets/sprites/pixel_v3/pushedAway_frame1.png',
-    ],
-    CatState.sleeping: [
-      'assets/sprites/pixel_v3/sleeping_frame0.png',
-      'assets/sprites/pixel_v3/sleeping_frame1.png',
-    ],
-    CatState.squished: [
-      'assets/sprites/pixel_v3/squished_frame0.png',
-      'assets/sprites/pixel_v3/squished_frame1.png',
-    ],
-    CatState.shocked: [
-      'assets/sprites/pixel_v3/shocked_frame0.png',
-      'assets/sprites/pixel_v3/shocked_frame1.png',
-    ],
-    CatState.celebrating: [
-      'assets/sprites/pixel_v3/celebrating_frame0.png',
-      'assets/sprites/pixel_v3/celebrating_frame1.png',
-      'assets/sprites/pixel_v3/celebrating_frame2.png',
-    ],
-  };
+  static const _basePath = 'assets/sprites/pixel_v4';
+
+  String _framePath(int frame) {
+    return '$_basePath/${widget.catState.name}_frame${frame.toString().padLeft(2, '0')}.png';
+  }
 
   @override
   void initState() {
     super.initState();
     _frameController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: _frameDurations[widget.catState] ?? 400),
+      duration: Duration(milliseconds: _frameDurations[widget.catState] ?? 100),
     )..repeat();
     _frameController.addListener(_onFrame);
   }
 
   void _onFrame() {
-    final frameCount = _frameCounts[widget.catState] ?? 2;
-    final newFrame = (_frameController.value * frameCount).floor() % frameCount;
+    final newFrame = (_frameController.value * _totalFrames).floor() % _totalFrames;
     if (newFrame != _currentFrame) {
       setState(() => _currentFrame = newFrame);
     }
@@ -100,7 +55,7 @@ class _CatCharacterState extends State<CatCharacter> with SingleTickerProviderSt
     super.didUpdateWidget(oldWidget);
     if (oldWidget.catState != widget.catState) {
       _currentFrame = 0;
-      _frameController.duration = Duration(milliseconds: _frameDurations[widget.catState] ?? 400);
+      _frameController.duration = Duration(milliseconds: _frameDurations[widget.catState] ?? 100);
     }
   }
 
@@ -112,16 +67,11 @@ class _CatCharacterState extends State<CatCharacter> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final paths = _spritePaths[widget.catState] ?? [];
-    if (paths.isEmpty || _currentFrame >= paths.length) {
-      return const SizedBox(width: 160, height: 160);
-    }
-
     return SizedBox(
       width: 160,
       height: 160,
       child: Image.asset(
-        paths[_currentFrame],
+        _framePath(_currentFrame),
         fit: BoxFit.contain,
         filterQuality: FilterQuality.none,
         errorBuilder: (context, error, stackTrace) {

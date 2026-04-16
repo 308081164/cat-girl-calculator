@@ -24,6 +24,7 @@ flutter:
     - assets/images/
     - assets/sprites/pixel_v2/
     - assets/sprites/pixel_v3/
+    - assets/sprites/pixel_v4/
 
 flutter_launcher_icons:
   android: true
